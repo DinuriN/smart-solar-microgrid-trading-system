@@ -24,6 +24,12 @@ builder.Services.AddSingleton<MongoDbContext>();
 //auth service
 builder.Services.AddScoped<SmartGrid.API.Services.AuthService>();
 
+//user service
+builder.Services.AddScoped<SmartGrid.API.Services.UserService>();
+
+//prosumer service
+builder.Services.AddScoped<SmartGrid.API.Services.ProsumerService>();
+
 
 // Configure Swagger/OpenAPI for API documentation and testing
 
