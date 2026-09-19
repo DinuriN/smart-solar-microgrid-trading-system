@@ -1,0 +1,51 @@
+# =========================
+# .NET Core & Visual Studio
+# =========================
+bin/
+obj/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+.vs/
+.vscode/
+
+# =========================
+# Environment & Secrets
+# =========================
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+appsettings.Development.json
+
+# =========================
+# React (Node.js)
+# =========================
+node_modules/
+dist/
+build/
+.npm/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# =========================
+# Android Studio & Gradle
+# =========================
+.gradle/
+local.properties
+.idea/
+*.iml
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# =========================
+# macOS Specific
+# =========================
+.DS_Store
+.AppleDouble
+.LSOverride
