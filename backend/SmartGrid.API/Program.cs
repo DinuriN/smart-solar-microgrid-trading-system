@@ -6,16 +6,16 @@
  * Date         : 2026-09-18
  */
 
-
-
+using DotNetEnv;
 using SmartGrid.API.Database;
+
+// Load environment variables from the .env file
+Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 // Register Controllers so ASP.NET knows how to handle API routes
-
 
 builder.Services.AddControllers();
 
@@ -62,8 +62,11 @@ builder.Services.AddSwaggerGen(
 
 
 //Configure JWT Authentication
-var jwtSettings = builder.Configuration.GetSection("Jwt");
-var key = System.Text.Encoding.ASCII.GetBytes(jwtSettings["Key"]!);
+var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
+var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
+var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
+
+var key = System.Text.Encoding.ASCII.GetBytes(jwtKey!);
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme;
@@ -79,8 +82,8 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(key),
         ValidateIssuer = true,
         ValidateAudience = true,
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidAudience = jwtSettings["Audience"]
+        ValidIssuer = jwtIssuer,
+        ValidAudience = jwtAudience
     };
 });
 

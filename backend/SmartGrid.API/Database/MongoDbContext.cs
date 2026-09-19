@@ -19,8 +19,8 @@ namespace SmartGrid.API.Database
         //MongoDB connection using the configuration settings
         public MongoDbContext(IConfiguration configuration)
         {
-            var connectionString = configuration.GetSection("MongoDbSettings:ConnectionString").Value;
-            var databaseName = configuration.GetSection("MongoDbSettings:DatabaseName").Value;
+            var connectionString = Environment.GetEnvironmentVariable("MONGO_URI");
+            var databaseName = Environment.GetEnvironmentVariable("MONGO_DB_NAME");
 
             var client = new MongoClient(connectionString);
             _database = client.GetDatabase(databaseName);
