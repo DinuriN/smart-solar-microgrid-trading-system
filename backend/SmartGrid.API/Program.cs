@@ -30,6 +30,9 @@ builder.Services.AddScoped<SmartGrid.API.Services.UserService>();
 //prosumer service
 builder.Services.AddScoped<SmartGrid.API.Services.ProsumerService>();
 
+//grid operations service
+builder.Services.AddScoped<SmartGrid.API.Services.GridOperationsService>();
+
 
 // Configure Swagger/OpenAPI for API documentation and testing
 
