@@ -43,5 +43,38 @@ namespace SmartGrid.API.Controllers
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
+//fetch all web users
+        [HttpGet]
+        [Authorize(Roles="BackOfficeUser")]
+        public async Task<IActionResult> GetAllWebUsers()
+        {
+            try{
+                var users = await _userService.GetAllWebUsersAsync();
+                return Ok (new{success= true, data = users});
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500,new{success = false, message = ex.Message});
+            }
+        }
+//reset users password
+        [HttpPut("{id}/reset-password")]
+        [Authorize(Roles="BackOfficeUser")]
+        public async Task<IActionResult> ResetPassword(string id, [FromBody] UpdatePasswordDto dto)
+        {
+            try{
+                var success = await _userService.ResetPasswordAsync(id, dto.NewPassword);
+                if(!success) return NotFound(new {success = false, message ="User not found or password not reset."});
+                return Ok(new {success=true, message="Password reset successfully."});
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(new{success =false, message= ex.Message});
+            }
+        }
+        
+
+
+
     }
 }

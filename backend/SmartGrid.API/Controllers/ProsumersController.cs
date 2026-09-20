@@ -104,5 +104,21 @@ namespace SmartGrid.API.Controllers
             if (!success) return NotFound();
             return Ok(new { success = true, message = "Prosumer reactivated." });
         }
+        //fecth all prosumers
+        [HttpGet]
+        [Authorize(Roles = "BackOfficeUser,GridOperator")]
+        public async Task<IActionResult> GetAllProsumers()
+        {
+            var prosumers = await _prosumerService.GetAllProsumersAsync();
+            return Ok(new { success = true, data = prosumers });
+        }
+        //fecth all deactivation requests
+        [HttpGet("deactivation-requests")]
+        [Authorize(Roles = "BackOfficeUser,GridOperator")]
+        public async Task<IActionResult> GetAllDeactivationRequests()
+        {
+            var requests = await _prosumerService.GetDeactivationRequestsAsync();
+            return Ok(new { success = true, data = requests });
+        }
     }
 }
