@@ -93,7 +93,17 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-
+// Configure CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp",
+        policy =>
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
 
 var app = builder.Build();
 
@@ -105,10 +115,10 @@ if (app.Environment.IsDevelopment())
 }
 
 
-
+//Enable CORS
+app.UseCors("AllowReactApp");
 
 //Enable Authentication and Authorization
-
 app.UseAuthentication();
 app.UseAuthorization();
 
