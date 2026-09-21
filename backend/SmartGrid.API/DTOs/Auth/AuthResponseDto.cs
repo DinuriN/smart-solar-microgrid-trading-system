@@ -13,5 +13,9 @@ namespace SmartGrid.API.DTOs.Auth
         public string Token { get; set; } = string.Empty;
         public string Role { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
+
+
+        // FAT Backend: Send the dynamic navigation menu to the Thin Client
+        public System.Collections.Generic.List<MenuItemDto> Menu { get; set; } = new();
     }
 }
