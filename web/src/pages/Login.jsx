@@ -28,8 +28,17 @@ export default function Login() {
       localStorage.setItem('userRole', data.role);
       localStorage.setItem('userName', data.name);
 
-      // Navigate to the admin dashboard
-      navigate('/admin/prosumers');
+      // FAT Backend: Save the dynamic menu sent by the server
+      localStorage.setItem('menu', JSON.stringify(data.menu || []));
+
+      // Navigate to the first route they have access
+      const menu = data.menu || [];
+      if (menu.length > 0) {
+        navigate(menu[0].path);
+      } else {
+        // If they have no permissions, send them to the empty Welcome screen
+        navigate('/admin/welcome');
+      }
 
     } catch (error) {
       // Ensure we always set a string for React to render
