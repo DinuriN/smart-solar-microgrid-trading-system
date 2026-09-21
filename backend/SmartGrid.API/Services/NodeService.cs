@@ -131,6 +131,15 @@ namespace SmartGrid.API.Services
             return slot != null && slot.Status == "Available";
         }
 
+        // Inline comment: Retrieves all battery slots for a specific node (for viewing/editing in UI)
+        public async Task<List<BatterySlot>> GetBatterySlotsByNodeIdAsync(string nodeId)
+        {
+            return await _batterySlotsCollection
+                .Find(s => s.MicroGridId == nodeId)
+                .SortBy(s => s.StartTime)
+                .ToListAsync();
+        }
+
         // Inline comment: Updates the status of battery slots for a specific node
         public async Task<bool> UpdateBatterySlotsAsync(string nodeId, List<BatterySlot> slots)
         {

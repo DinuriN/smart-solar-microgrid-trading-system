@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import DashboardLayout from './components/layout/DashboardLayout';
 import ProsumersList from './pages/admin/ProsumersList';
+import NodesList from './pages/admin/NodesList';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 
@@ -25,6 +26,7 @@ function App() {
           <Route path="/admin" element={<DashboardLayout />}>
             <Route index element={<Navigate to="prosumers" replace />} />
             <Route path="prosumers" element={<ProsumersList />} />
+            <Route path="nodes" element={<NodesList />} />
             <Route path="users" element={<div className="p-8 text-white">Web Users screen coming soon...</div>} />
           </Route>
 

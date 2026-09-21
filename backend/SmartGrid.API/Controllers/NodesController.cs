@@ -94,17 +94,27 @@ namespace SmartGrid.API.Controllers
         public async Task<IActionResult> CheckBatterySlotAvailability(string id, string slotId)
         {
             var isAvailable = await _nodeService.IsBatterySlotAvailableAsync(id, slotId);
-            
-            return Ok(new { 
-                success = true, 
-                data = new { 
-                    nodeId = id, 
-                    slotId = slotId, 
-                    isAvailable = isAvailable 
-                } 
+
+            return Ok(new
+            {
+                success = true,
+                data = new
+                {
+                    nodeId = id,
+                    slotId = slotId,
+                    isAvailable = isAvailable
+                }
             });
         }
 
+        // Inline comment: Retrieves all battery slots for a specific node
+        [HttpGet("{id}/battery-slots")]
+        public async Task<IActionResult> GetBatterySlots(string id)
+        {
+            var slots = await _nodeService.GetBatterySlotsByNodeIdAsync(id);
+            return Ok(new { success = true, data = slots });
+        }
+        
         // Inline comment: Updates battery slot availability for a specific node (GridOperator)
         [HttpPut("{id}/battery-slots")]
         [Authorize(Roles = "BackOfficeUser,GridOperator")]
