@@ -9,6 +9,7 @@ obj/
 *.sln.docstates
 .vs/
 .vscode/
+Services/FakeNodeGateway.cs
 
 # =========================
 # Environment & Secrets
@@ -49,3 +50,5 @@ captures/
 .DS_Store
 .AppleDouble
 .LSOverride
+
+
