@@ -44,11 +44,21 @@ namespace SmartGrid.API.Services
 
             var token = GenerateJwtToken(user);
 
+            // FAT Backend: Dynamically calculate the navigation menu
+            var menu = new List<MenuItemDto>();
+            if (user.Role == UserRole.BackOfficeUser)
+            {
+                menu.Add(new MenuItemDto { Label = "Prosumers", Path = "/admin/prosumers", Icon = "users" });
+                menu.Add(new MenuItemDto { Label = "Web Users", Path = "/admin/users", Icon = "shield" });
+            }
+           
+
             return new AuthResponseDto
             {
                 Token = token,
                 Role = user.Role.ToString(),
-                Name = user.Name
+                Name = user.Name,
+                Menu = menu
             };
         }
 
@@ -67,6 +77,11 @@ namespace SmartGrid.API.Services
                 new Claim(ClaimTypes.Role, user.Role.ToString())
             };
 
+              // If the user is a Prosumer, add NIC in the token!
+            if (user is Prosumer prosumer)
+            {
+                claims.Add(new Claim("nic", prosumer.Nic));
+            }
             var token = new JwtSecurityToken(
                 issuer: jwtIssuer,
                 audience: jwtAudience,

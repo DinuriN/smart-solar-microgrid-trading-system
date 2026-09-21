@@ -63,5 +63,26 @@ namespace SmartGrid.API.Services
             newUser.PasswordHash = string.Empty; 
             return newUser;
         }
+//get all web users
+        public async Task<List<User>> GetAllWebUsersAsync()
+        {
+            var users = await _usersCollection.Find(u => u.Role == UserRole.GridOperator || u.Role == UserRole.BackOfficeUser).ToListAsync();
+//password hash before returning
+            foreach(var user in users)
+            {
+                user.PasswordHash = string.Empty;
+            }
+            return users;
+        }
+//admin password reset
+        public async Task<bool> ResetPasswordAsync(string userId, string newPassword)
+        {
+            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(newPassword);
+            var update = Builders<User>.Update.Set(u => u.PasswordHash, hashedPassword);
+            var result = await _usersCollection.UpdateOneAsync(u => u.Id == userId, update);
+            return result.ModifiedCount > 0;
+        }
+
+
     }
 }

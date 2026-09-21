@@ -94,7 +94,10 @@ namespace SmartGrid.API.Services
         // Toggles the IsActive status (used for deactivate/reactivate).
         public async Task<bool> SetActiveStatusAsync(string nic, bool isActive)
         {
-            var update = Builders<User>.Update.Set(p => p.IsActive, isActive);
+            var update = Builders<User>.Update.Set(p => p.IsActive, isActive)
+            .Set(nameof(Prosumer.DeactivationRequested), false);//clear deactivate request status when aprove or reject.
+
+            
             var result = await _usersCollection.UpdateOneAsync(
                 Builders<User>.Filter.OfType<Prosumer>(p => p.Nic == nic), 
                 update);
@@ -116,5 +119,36 @@ namespace SmartGrid.API.Services
                 Role = prosumer.Role.ToString()
             };
         }
+
+//fetch all prosumers
+        public async Task<List<ProsumerResponseDto>> GetAllProsumersAsync()
+        {
+            var Filter = Builders<User>.Filter.Eq(u => u.Role, UserRole.Prosumer);
+            var prosumers = await _usersCollection.Find(Filter).ToListAsync();
+            var responseList = new List<ProsumerResponseDto>();
+            foreach (var user in prosumers){
+                responseList.Add(MapToResponseDto((Prosumer)user));
+            }
+            return responseList;
+        }
+//fetch deactivation request list
+        public async Task<List<ProsumerResponseDto>> GetDeactivationRequestsAsync()
+        {
+            var filter = Builders<User>.Filter.And(
+                Builders<User>.Filter.Eq(u => u.Role, UserRole.Prosumer),
+                Builders<User>.Filter.Eq(u => ((Prosumer)u).DeactivationRequested,true)
+            );
+
+            var prosumers = await _usersCollection.Find(filter).ToListAsync();
+            var responseList = new List<ProsumerResponseDto>();
+            foreach(var user in prosumers){
+                responseList.Add(MapToResponseDto((Prosumer)user));
+            }
+            return responseList;
+            
+            
+        }
+
+
     }
 }
