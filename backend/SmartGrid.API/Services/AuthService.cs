@@ -44,11 +44,21 @@ namespace SmartGrid.API.Services
 
             var token = GenerateJwtToken(user);
 
+            // FAT Backend: Dynamically calculate the navigation menu
+            var menu = new List<MenuItemDto>();
+            if (user.Role == UserRole.BackOfficeUser)
+            {
+                menu.Add(new MenuItemDto { Label = "Prosumers", Path = "/admin/prosumers", Icon = "users" });
+                menu.Add(new MenuItemDto { Label = "Web Users", Path = "/admin/users", Icon = "shield" });
+            }
+           
+
             return new AuthResponseDto
             {
                 Token = token,
                 Role = user.Role.ToString(),
-                Name = user.Name
+                Name = user.Name,
+                Menu = menu
             };
         }
 

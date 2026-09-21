@@ -1,32 +1,54 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { authService } from '../api/authService';
 
 export default function Login() {
   const [emailOrNic, setEmailOrNic] = useState('');
   const [password, setPassword] = useState('');
-  
+
   // States for API feedback
   const [errorMsg, setErrorMsg] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const navigate = useNavigate();
+
   // 2. Form Submission Handler
   const handleLogin = async (e) => {
-    e.preventDefault(); 
+    e.preventDefault();
     setErrorMsg(null);
     setIsLoading(true);
 
     try {
       // Call the C# Backend
       const data = await authService.login(emailOrNic, password);
-      
+
       // If success, save the JWT token
       localStorage.setItem('token', data.token);
-      
-      // Tell the user it worked!
-      alert(`Login Successful! Welcome ${data.user.name}. Role: ${data.user.role}`);
-      
+
+      localStorage.setItem('userRole', data.role);
+      localStorage.setItem('userName', data.name);
+
+      // FAT Backend: Save the dynamic menu sent by the server
+      localStorage.setItem('menu', JSON.stringify(data.menu || []));
+
+      // Navigate to the first route they have access
+      const menu = data.menu || [];
+      if (menu.length > 0) {
+        navigate(menu[0].path);
+      } else {
+        // If they have no permissions, send them to the empty Welcome screen
+        navigate('/admin/welcome');
+      }
+
     } catch (error) {
-      setErrorMsg(error);
+      // Ensure we always set a string for React to render
+      setErrorMsg(error?.response?.data?.message || error.message || String(error));
+
+      // Clear the invalid token from storage
+      localStorage.removeItem('token');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('userName');
+
     } finally {
       setIsLoading(false);
     }
@@ -35,7 +57,7 @@ export default function Login() {
   return (
     // Background container with ambient glowing orbs
     <div className="min-h-screen flex items-center justify-center bg-slate-950 p-4 relative overflow-hidden">
-      
+
       {/* Ambient background glows */}
       <div className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] bg-amber-500/10 rounded-full blur-[120px] pointer-events-none"></div>
       <div className="absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] bg-teal-500/10 rounded-full blur-[120px] pointer-events-none"></div>
@@ -43,13 +65,13 @@ export default function Login() {
       {/* Glassmorphic Login Box */}
       <div className="w-full max-w-md relative z-10">
         <div className="bg-slate-900/40 backdrop-blur-2xl border border-slate-800/60 p-8 sm:p-10 rounded-3xl shadow-[0_0_40px_rgba(0,0,0,0.5)]">
-          
+
           {/* Brand Header */}
           <div className="flex items-center gap-3 mb-10">
             <div className="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(245,165,36,0.3)]">
               {/* Simple SVG Bolt Icon */}
               <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5 text-slate-950">
-                <path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z" fill="currentColor"/>
+                <path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z" fill="currentColor" />
               </svg>
             </div>
             <div>
@@ -65,7 +87,7 @@ export default function Login() {
 
           {/* Login Form */}
           <form onSubmit={handleLogin} className="space-y-5">
-            
+
             {/* Error Message Display */}
             {errorMsg && (
               <div className="bg-red-500/10 border border-red-500/50 text-red-400 text-xs px-4 py-3 rounded-xl">
