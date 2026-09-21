@@ -1,20 +1,23 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 
 export default function Sidebar() {
+
+
+  const navigate = useNavigate();
   // SVG Icons
   const Icons = {
-    Dashboard: (
+    dashboard: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-4 h-4 opacity-85 shrink-0">
         <rect x="3" y="3" width="7" height="9" rx="1" /><rect x="14" y="3" width="7" height="5" rx="1" /><rect x="14" y="12" width="7" height="9" rx="1" /><rect x="3" y="16" width="7" height="5" rx="1" />
       </svg>
     ),
-    Prosumers: (
+    users: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-4 h-4 opacity-85 shrink-0">
         <circle cx="12" cy="8" r="3.2" /><path d="M4 20c1.5-4 5-6 8-6s6.5 2 8 6" />
       </svg>
     ),
-    Users: (
+    shield: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-4 h-4 opacity-85 shrink-0">
         <rect x="3" y="4" width="18" height="16" rx="2" /><path d="M7 9h10M7 13h6" />
       </svg>
@@ -32,6 +35,16 @@ export default function Sidebar() {
   const userName = localStorage.getItem('userName') || 'User';
   const userRole = localStorage.getItem('userRole') || 'Role';
   const initial = userName.charAt(0).toUpperCase();
+
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('menu');
+    navigate('/login');
+  };
+
 
   return (
     <aside className="w-60 bg-slate-900 border-r border-slate-800 flex flex-col h-screen sticky top-0 shrink-0">
@@ -76,6 +89,21 @@ export default function Sidebar() {
             <div className="text-sm font-medium text-white truncate">{userName}</div>
             <div className="text-[10px] text-slate-500 font-mono truncate">{userRole}</div>
           </div>
+
+          <button
+            onClick={handleLogout}
+            title="Log Out"
+            className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors ml-auto"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+          </button>
+
+
+
         </div>
       </div>
 
