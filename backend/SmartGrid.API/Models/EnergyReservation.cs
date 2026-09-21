@@ -69,10 +69,6 @@ namespace SmartGrid.API.Models
         [BsonRepresentation(BsonType.String)]
         public ReservationStatus Status { get; set; } = ReservationStatus.Pending;
 
-        // Set once a Grid Operator's node is assigned to handle this reservation
-        [BsonElement("assignedOperatorId")]
-        public string? AssignedOperatorId { get; set; }
-
         // Populated by approve/QR-generation logic
         [BsonElement("qrCode")]
         public QrInfo? QrCode { get; set; }
