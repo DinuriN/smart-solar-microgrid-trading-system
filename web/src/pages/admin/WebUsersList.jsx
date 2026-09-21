@@ -6,6 +6,15 @@ export default function WebUsersList() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [modalError, setModalError] = useState(null);
+  const [formData, setFormData] = useState({
+    name: '', email: '', phone: '', password: '', role: 'GridOperator'
+  });
+
+
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -36,6 +45,27 @@ export default function WebUsersList() {
     }
   };
 
+  const handleCreateSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setModalError(null);
+    try {
+      await webUserService.create(formData);
+      setIsModalOpen(false);
+      setFormData({ name: '', email: '', phone: '', password: '', role: 'GridOperator' });
+      fetchUsers(); // Refresh table
+    } catch (err) {
+      setModalError(err.response?.data?.message || err.message || "Failed to create user.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+
+
+
+
+
   // Maps roles nicely. With JsonStringEnumConverter, backend sends "GridOperator" or "BackOfficeUser"
   const getRoleBadge = (role) => {
     if (role === 'GridOperator') {
@@ -63,7 +93,9 @@ export default function WebUsersList() {
 
       {/* Toolbar */}
       <div className="flex items-center justify-end mb-5">
-        <button className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-4 py-2 rounded-lg text-sm transition-colors">
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-4 py-2 rounded-lg text-sm transition-colors">
           + Register Web User
         </button>
       </div>
@@ -131,6 +163,52 @@ export default function WebUsersList() {
           </div>
         )}
       </div>
+
+      {/* Minimal Glassmorphic Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-slate-900 border border-slate-700 w-full max-w-md rounded-2xl shadow-2xl p-6 relative">
+            <h2 className="text-xl font-semibold text-white mb-4">Register Web User</h2>
+
+            {modalError && <div className="mb-4 text-xs bg-red-500/10 text-red-500 p-2 rounded border border-red-500/20">{modalError}</div>}
+
+            <form onSubmit={handleCreateSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-slate-400 mb-1">Name</label>
+                <input required type="text" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none transition-colors" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-400 mb-1">Email</label>
+                <input required type="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none transition-colors" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-400 mb-1">Phone</label>
+                <input required type="text" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none transition-colors" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-400 mb-1">Password</label>
+                <input required type="password" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none transition-colors" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-400 mb-1">Role</label>
+                <select value={formData.role} onChange={e => setFormData({ ...formData, role: e.target.value })} className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none transition-colors">
+                  <option value="GridOperator">Grid Operator</option>
+                  <option value="BackOfficeUser">Back Office User</option>
+                </select>
+              </div>
+
+              <div className="pt-4 flex justify-end gap-3 border-t border-slate-800">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-sm text-slate-400 hover:text-white transition-colors">Cancel</button>
+                <button type="submit" disabled={isSubmitting} className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-5 py-2 rounded-lg text-sm transition-colors disabled:opacity-50">
+                  {isSubmitting ? 'Creating...' : 'Register'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+
 
     </div>
   );

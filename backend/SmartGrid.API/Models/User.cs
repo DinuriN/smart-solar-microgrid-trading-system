@@ -10,6 +10,8 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System;
 
+using System.Text.Json.Serialization;
+
 namespace SmartGrid.API.Models
 {
     [BsonDiscriminator(RootClass = true)]
@@ -24,6 +26,8 @@ namespace SmartGrid.API.Models
         public string Email { get; set; } = string.Empty; // We use Email for Backoffice/Grid Operator login
         public string Phone { get; set; } = string.Empty;
         public bool IsActive { get; set; } = true;
+        
+        [JsonIgnore]
         public string PasswordHash { get; set; } = string.Empty;
         
         [BsonRepresentation(BsonType.String)] // Save the enum as text (e.g. "Prosumer") instead of numbers
