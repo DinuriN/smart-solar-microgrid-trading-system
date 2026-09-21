@@ -67,6 +67,11 @@ namespace SmartGrid.API.Services
                 new Claim(ClaimTypes.Role, user.Role.ToString())
             };
 
+              // If the user is a Prosumer, add NIC in the token!
+            if (user is Prosumer prosumer)
+            {
+                claims.Add(new Claim("nic", prosumer.Nic));
+            }
             var token = new JwtSecurityToken(
                 issuer: jwtIssuer,
                 audience: jwtAudience,
