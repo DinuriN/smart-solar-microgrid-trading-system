@@ -173,5 +173,41 @@ namespace SmartGrid.API.Services
                 CalculateDistance(lat, lng, n.Location.Latitude, n.Location.Longitude) <= radiusKm
             ).ToList();
         }
+
+        // ==========================================
+        // NEW METHODS FOR MEMBER 3 (Reservation Workflow)
+        // ==========================================
+
+        // 1. Get a single battery slot by ID (For Member 3's reservation validation)
+        public async Task<BatterySlot?> GetSlotAsync(string nodeId, string slotId)
+        {
+            return await _batterySlotsCollection
+                .Find(s => s.Id == slotId && s.MicroGridId == nodeId)
+                .FirstOrDefaultAsync();
+        }
+
+        // 2. Update status of a single slot (For Member 3's booking workflow)
+        public async Task<bool> UpdateSlotStatusAsync(string nodeId, string slotId, string status)
+        {
+            var update = Builders<BatterySlot>.Update.Set(s => s.Status, status);
+            var result = await _batterySlotsCollection.UpdateOneAsync(
+                s => s.Id == slotId && s.MicroGridId == nodeId, 
+                update
+            );
+            return result.ModifiedCount > 0;
+        }
+
+        // 3. Get slots available at specific arrival time (For Member 3's mobile booking)
+        public async Task<List<BatterySlot>> GetAvailableSlotsAtTimeAsync(string nodeId, DateTime arrivalTime)
+        {
+            return await _batterySlotsCollection
+                .Find(s => s.MicroGridId == nodeId && 
+                           s.StartTime <= arrivalTime && 
+                           s.EndTime >= arrivalTime && 
+                           s.Status == "Available")
+                .SortBy(s => s.StartTime)
+                .ToListAsync();
+        }
+ 
     }
 }

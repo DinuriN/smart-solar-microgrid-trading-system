@@ -114,7 +114,38 @@ namespace SmartGrid.API.Controllers
             var slots = await _nodeService.GetBatterySlotsByNodeIdAsync(id);
             return Ok(new { success = true, data = slots });
         }
-        
+
+        // Inline comment: Retrieves a single battery slot by ID (For Member 3 reservation validation)
+        [HttpGet("{id}/battery-slots/{slotId}")]
+        public async Task<IActionResult> GetSlot(string id, string slotId)
+        {
+            var slot = await _nodeService.GetSlotAsync(id, slotId);
+            if (slot == null)
+                return NotFound(new { success = false, message = "Slot not found" });
+
+            return Ok(new { success = true, data = slot });
+        }
+
+        // Inline comment: Updates the status of a single battery slot (For Member 3 booking workflow)
+        [HttpPatch("{id}/battery-slots/{slotId}/status")]
+        [Authorize(Roles = "BackOfficeUser,GridOperator")] 
+        public async Task<IActionResult> UpdateSlotStatus(string id, string slotId, [FromBody] UpdateSlotStatusDto dto)
+        {
+            var success = await _nodeService.UpdateSlotStatusAsync(id, slotId, dto.Status);
+            if (!success)
+                return NotFound(new { success = false, message = "Slot not found or update failed" });
+
+            return Ok(new { success = true, message = "Slot status updated successfully" });
+        }
+
+        // Inline comment: Retrieves slots available at a specific arrival time (For Member 3 mobile booking)
+        [HttpGet("{id}/battery-slots/available")]
+        public async Task<IActionResult> GetAvailableSlotsAtTime(string id, [FromQuery] DateTime arrivalTime)
+        {
+            var slots = await _nodeService.GetAvailableSlotsAtTimeAsync(id, arrivalTime);
+            return Ok(new { success = true, data = slots });
+        }
+
         // Inline comment: Updates battery slot availability for a specific node (GridOperator)
         [HttpPut("{id}/battery-slots")]
         [Authorize(Roles = "BackOfficeUser,GridOperator")]
