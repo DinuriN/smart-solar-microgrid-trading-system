@@ -212,11 +212,18 @@ namespace SmartGrid.API.Services
         }
 
         // ---------- BACKOFFICE ----------
-        public async Task<List<ReservationResponseDto>> GetBackOfficeQueueAsync()
+        public async Task<List<ReservationResponseDto>> GetBackOfficeQueueAsync(string? status = null)
         {
-            // Read-only list of every reservation for BackOffice review
+            var filterBuilder = Builders<EnergyReservation>.Filter;
+            var filter = filterBuilder.Empty;
+
+            if (!string.IsNullOrWhiteSpace(status) && Enum.TryParse<ReservationStatus>(status, true, out var parsedStatus))
+            {
+                filter &= filterBuilder.Eq(r => r.Status, parsedStatus);
+            }
+
             var results = await _db.Reservations
-                .Find(_ => true)
+                .Find(filter)
                 .SortBy(r => r.ScheduledDateTime)
                 .ToListAsync();
 

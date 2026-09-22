@@ -101,12 +101,14 @@ export default function ReservationsList() {
 
   return (
     <div className="p-6">
-      <div className="mb-4 rounded border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm text-slate-300">
-        <span className="font-semibold text-amber-400">Scheduling rule:</span> new reservations must
-        fall within the next 7 days.{" "}
-        <span className="font-semibold text-amber-400">Modification rule:</span> updates or
-        cancellations require at least 12 hours' notice.
-      </div>
+      {!isBackOffice && (
+        <div className="mb-4 rounded border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm text-slate-300">
+          <span className="font-semibold text-amber-400">Scheduling rule:</span> new reservations must
+          fall within the next 7 days.{" "}
+          <span className="font-semibold text-amber-400">Modification rule:</span> updates or
+          cancellations require at least 12 hours' notice.
+        </div>
+      )}
 
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <input

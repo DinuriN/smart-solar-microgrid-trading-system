@@ -21,7 +21,7 @@ namespace SmartGrid.API.Services
         Task<ReservationResponseDto?> GetNextForOperatorAsync(string operatorId);
 
         // Read-only list for BackOffice.
-        Task<List<ReservationResponseDto>> GetBackOfficeQueueAsync();
+        Task<List<ReservationResponseDto>> GetBackOfficeQueueAsync(string? status = null);
         Task<List<ReservationResponseDto>> SearchAsync(string criteria, string requesterRole, string requesterNic, string? requesterOperatorId, string? status = null);
     }
 }

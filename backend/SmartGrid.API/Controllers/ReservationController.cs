@@ -154,10 +154,10 @@ namespace SmartGrid.API.Controllers
         [HttpGet("queue")]
         [Authorize(Roles = "BackOfficeUser")]
         [ProducesResponseType(typeof(List<ReservationResponseDto>), 200)]
-        public async Task<IActionResult> GetQueue()
+        public async Task<IActionResult> GetQueue([FromQuery] string? status)
         {
-            //Unscoped list of every reservation, sorted by scheduled time
-            var queue = await _reservationService.GetBackOfficeQueueAsync();
+            // Unscoped list of every reservation, sorted by scheduled time, optionally filtered by status
+            var queue = await _reservationService.GetBackOfficeQueueAsync(status);
             return Ok(queue);
         }
 

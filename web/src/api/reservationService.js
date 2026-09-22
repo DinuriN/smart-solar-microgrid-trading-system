@@ -3,9 +3,14 @@ import axiosClient from "./axiosClient";
 const BASE = "/reservations";
 
 // Shared search - backend scopes results by the caller's role automatically
-export const searchReservations = (criteria) =>
-  axiosClient.get(`${BASE}/search`, { params: { criteria } });
-
+export const searchReservations = (criteria, status) =>
+  axiosClient.get(`${BASE}/search`, {
+    params: {
+      criteria,
+      ...(status ? { status } : {}),
+    },
+  });
+  
 // BackOffice - read-only queue, optional status filter
 export const getBackOfficeQueue = (status) =>
   axiosClient.get(`${BASE}/queue`, { params: status ? { status } : {} });
