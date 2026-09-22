@@ -148,5 +148,18 @@ namespace SmartGrid.API.Controllers
             var next = await _reservationService.GetNextForOperatorAsync(operatorId);
             return next is null ? NoContent() : Ok(next);
         }
+
+        /// <summary>Returns the full reservation queue for BackOffice review (read-only —
+        /// Approve/Block actions are owned by Member 4 which updates the same EnergyReservation document's Status field.)</summary>
+        [HttpGet("queue")]
+        [Authorize(Roles = "BackOfficeUser")]
+        [ProducesResponseType(typeof(List<ReservationResponseDto>), 200)]
+        public async Task<IActionResult> GetQueue()
+        {
+            //Unscoped list of every reservation, sorted by scheduled time
+            var queue = await _reservationService.GetBackOfficeQueueAsync();
+            return Ok(queue);
+        }
+
     }
 }
