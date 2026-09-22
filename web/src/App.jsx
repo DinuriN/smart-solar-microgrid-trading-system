@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import DashboardLayout from './components/layout/DashboardLayout';
 import Welcome from './pages/admin/Welcome';
 import ProsumersList from './pages/admin/ProsumersList';
+import NodesList from './pages/admin/NodesList';
 import WebUsersList from './pages/admin/WebUsersList';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Dashboard from './pages/admin/Dashboard';
@@ -30,6 +31,7 @@ function App() {
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="welcome" element={<Welcome />} />
             <Route path="prosumers" element={<ProsumersList />} />
+            <Route path="nodes" element={<NodesList />} />
             <Route path="users" element={<WebUsersList />} />
             <Route path="dashboard" element={<Dashboard />} />
           </Route>
