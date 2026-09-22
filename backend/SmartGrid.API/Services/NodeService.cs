@@ -20,14 +20,15 @@ namespace SmartGrid.API.Services
     {
         private readonly IMongoCollection<SolarMicroGrid> _nodesCollection;
         private readonly IMongoCollection<BatterySlot> _batterySlotsCollection;
-        // TODO: Inject EnergyReservation collection once Member 3 provides schema
-        // private readonly IMongoCollection<EnergyReservation> _reservationsCollection;
+
+        private readonly IMongoCollection<EnergyReservation> _reservationsCollection;
 
         // Inline comment: Constructor injects MongoDB collections for node operations
         public NodeService(MongoDbContext context)
         {
             _nodesCollection = context.SolarMicroGrids;
             _batterySlotsCollection = context.BatterySlots;
+            _reservationsCollection = context.Reservations;
         }
 
         // Inline comment: Creates a new microgrid node with validated data
@@ -99,22 +100,20 @@ namespace SmartGrid.API.Services
         }
 
         // Inline comment: CRITICAL - Checks EnergyReservation collection for active/pending bookings before allowing deactivation
-        // TODO: Uncomment and implement reservation check once Member 3 provides exact field names
         public async Task<bool> DeactivateNodeAsync(string nodeId)
         {
-            /*
+            // Check for active reservations (Pending or Approved status)
             var activeReservations = await _reservationsCollection.CountDocumentsAsync(
-                r => r.[MEMBER3_FIELD_NAME] == nodeId && 
-                     (r.Status == "[MEMBER3_PENDING_STATUS]" || r.Status == "[MEMBER3_APPROVED_STATUS]")
+                r => r.NodeId == nodeId &&
+                     (r.Status == ReservationStatus.Pending || r.Status == ReservationStatus.Approved)
             );
 
             if (activeReservations > 0)
             {
                 throw new Exception($"Cannot deactivate node: {activeReservations} active reservation(s) exist.");
             }
-            */
 
-            // Placeholder: Actual reservation check will be added after Member 3 provides schema
+            // If no active reservations, proceed with deactivation
             var update = Builders<SolarMicroGrid>.Update.Set(n => n.IsActive, false);
             var result = await _nodesCollection.UpdateOneAsync(n => n.Id == nodeId, update);
             return result.ModifiedCount > 0;
@@ -191,7 +190,7 @@ namespace SmartGrid.API.Services
         {
             var update = Builders<BatterySlot>.Update.Set(s => s.Status, status);
             var result = await _batterySlotsCollection.UpdateOneAsync(
-                s => s.Id == slotId && s.MicroGridId == nodeId, 
+                s => s.Id == slotId && s.MicroGridId == nodeId,
                 update
             );
             return result.ModifiedCount > 0;
@@ -201,13 +200,13 @@ namespace SmartGrid.API.Services
         public async Task<List<BatterySlot>> GetAvailableSlotsAtTimeAsync(string nodeId, DateTime arrivalTime)
         {
             return await _batterySlotsCollection
-                .Find(s => s.MicroGridId == nodeId && 
-                           s.StartTime <= arrivalTime && 
-                           s.EndTime >= arrivalTime && 
+                .Find(s => s.MicroGridId == nodeId &&
+                           s.StartTime <= arrivalTime &&
+                           s.EndTime >= arrivalTime &&
                            s.Status == "Available")
                 .SortBy(s => s.StartTime)
                 .ToListAsync();
         }
- 
+
     }
 }

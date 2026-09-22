@@ -98,7 +98,9 @@ export default function NodesList() {
             await nodeService.deactivate(id);
             fetchNodes();
         } catch (err) {
-            alert(err.message || 'Failed to deactivate node');
+            // Extract the custom error message from the backend response
+            const errorMessage = err.response?.data?.message || err.message || 'Failed to deactivate node';
+            alert(errorMessage);
         }
     };
 
