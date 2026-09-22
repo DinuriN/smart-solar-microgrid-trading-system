@@ -1,3 +1,5 @@
+// TODO: uncomment once NodeService exists
+
 /*
  * File Name    : NodeGateway.cs
  * Description  : Connects the reservation component to  NodeService.
