@@ -36,8 +36,10 @@ builder.Services.AddScoped<SmartGrid.API.Services.UserService>();
 //prosumer service
 builder.Services.AddScoped<SmartGrid.API.Services.ProsumerService>();
 
+//node service
+builder.Services.AddScoped<SmartGrid.API.Services.NodeService>();
 //reservation service
-builder.Services.AddScoped<SmartGrid.API.Services.IReservationService, SmartGrid.API.Services.ReservationService>();
+//builder.Services.AddScoped<SmartGrid.API.Services.IReservationService, SmartGrid.API.Services.ReservationService>();
 //builder.Services.AddScoped<SmartGrid.API.Services.INodeGateway, SmartGrid.API.Services.NodeGateway>();
 //builder.Services.AddScoped<SmartGrid.API.Services.INodeGateway, SmartGrid.API.Services.FakeNodeGateway>();
 
