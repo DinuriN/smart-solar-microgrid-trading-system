@@ -89,6 +89,13 @@ export default function Sidebar() {
           Web Users
         </NavLink>
 
+        <div className="px-5 text-[10px] font-mono tracking-widest text-slate-500 mb-2 mt-4">OPERATIONS</div>
+
+        <NavLink to="/admin/reservations" className={navItemClass}>
+          {Icons.shield}
+          Reservations
+        </NavLink>
+
       </nav>
 
       {/* Footer / User Profile */}
