@@ -1,7 +1,7 @@
 /*
  * File Name    : ReservationsController.cs
  * Description  : Endpoints for creating, modifying and
- *                cancelling and viewing (Reservation history,Counts for Prosumer; Reservations queues and Upcoming Reservation lookups for Grid Operator) energy slot reservations.
+ *                cancelling and viewing energy slot reservations.(Reservation history,Counts for Prosumer; Reservations queues and Upcoming Reservation lookups for Grid Operator; read-only Reservation Queue for BackOffice user)
  * Author       : Kandaudahewa C I
  * IT Number    : IT23453142
  * Date         : 2026-09-22
@@ -161,5 +161,17 @@ namespace SmartGrid.API.Controllers
             return Ok(queue);
         }
 
+        /// <summary>Searches reservations scoped by the caller's role</summary>
+        [HttpGet("search")]
+        [ProducesResponseType(typeof(List<ReservationResponseDto>), 200)]
+        public async Task<IActionResult> Search([FromQuery] string criteria)
+        {
+            //Grid Operator's own id, used to scope results to their nodes
+            var operatorId = RequesterRole == "GridOperator" ? RequesterId : null;
+
+            var results = await _reservationService.SearchAsync(criteria, RequesterRole, RequesterNic, operatorId);
+            return Ok(results);
+        }
     }
+
 }
