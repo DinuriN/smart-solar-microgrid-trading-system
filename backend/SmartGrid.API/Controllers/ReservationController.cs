@@ -1,7 +1,7 @@
 /*
  * File Name    : ReservationsController.cs
- * Description  : Prosumer-facing endpoints for creating, modifying and
- *                cancelling and viewing (Reservation history,Counts) energy slot reservations.
+ * Description  : Endpoints for creating, modifying and
+ *                cancelling and viewing (Reservation history,Counts for Prosumer; Reservations queues and Upcoming Reservation lookups for Grid Operator) energy slot reservations.
  * Author       : Kandaudahewa C I
  * IT Number    : IT23453142
  * Date         : 2026-09-22
@@ -120,6 +120,33 @@ namespace SmartGrid.API.Controllers
             //Active = Approved, Pending = awaiting Backoffice User approval
             var counts = await _reservationService.GetCountsAsync(nic);
             return Ok(counts);
+        }
+
+        /// <summary>Returns reservations assigned to a Grid Operator, optionally filtered by status</summary>
+        [HttpGet("operator/{operatorId}")]
+        [Authorize(Roles = "GridOperator")]
+        [ProducesResponseType(typeof(List<ReservationResponseDto>), 200)]
+        public async Task<IActionResult> GetOperatorReservations(string operatorId, [FromQuery] string? status)
+        {
+            //Splits a comma-separated status query into a list; null means no filter
+            var statuses = string.IsNullOrEmpty(status)
+                ? null
+                : status.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+
+            var results = await _reservationService.GetOperatorReservationsAsync(operatorId, statuses);
+            return Ok(results);
+        }
+
+        /// <summary>Returns the Grid Operator's next upcoming approved booking</summary>
+        [HttpGet("operator/{operatorId}/next")]
+        [Authorize(Roles = "GridOperator")]
+        [ProducesResponseType(typeof(ReservationResponseDto), 200)]
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> GetNextForOperator(string operatorId)
+        {
+            //Returns 204 if the operator has no upcoming approved reservation
+            var next = await _reservationService.GetNextForOperatorAsync(operatorId);
+            return next is null ? NoContent() : Ok(next);
         }
     }
 }
