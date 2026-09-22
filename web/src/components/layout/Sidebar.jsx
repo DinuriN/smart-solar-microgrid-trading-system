@@ -64,6 +64,13 @@ export default function Sidebar() {
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto pb-4">
 
+        <div className="mb-2 mt-4 px-5 font-mono text-[10px] tracking-widest text-slate-500">OVERVIEW</div>
+
+        <NavLink to="/admin/dashboard" className={navItemClass}>
+          {Icons.dashboard}
+          Dashboard
+        </NavLink>
+
         <div className="px-5 text-[10px] font-mono tracking-widest text-slate-500 mb-2 mt-4">ADMINISTRATION</div>
 
         <NavLink to="/admin/prosumers" className={navItemClass}>

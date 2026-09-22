@@ -28,6 +28,9 @@ namespace SmartGrid.API.Database
 // Expose the Users collection
         public IMongoCollection<User> Users => _database.GetCollection<User>("users");
 
+//Expose the Reservations collection
+        public IMongoCollection<EnergyReservation> Reservations => _database.GetCollection<EnergyReservation>("reservations");
+
         public IMongoDatabase Database => _database;
     }
 }
