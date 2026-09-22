@@ -31,6 +31,9 @@ namespace SmartGrid.API.Database
         public IMongoCollection<SolarMicroGrid> SolarMicroGrids => _database.GetCollection<SolarMicroGrid>("Solar_MicroGrid");
         public IMongoCollection<BatterySlot> BatterySlots => _database.GetCollection<BatterySlot>("BatterySlot");
 
+//Expose the Reservations collection
+        public IMongoCollection<EnergyReservation> Reservations => _database.GetCollection<EnergyReservation>("reservations");
+
         public IMongoDatabase Database => _database;
     }
 }

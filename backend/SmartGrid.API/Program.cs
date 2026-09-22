@@ -17,7 +17,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 // Register Controllers so ASP.NET knows how to handle API routes
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // Enums will be serialized as Strings instead of Integers, 
+        // so the Thin Client doesn't have to map them!
+        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    });
 
 // Register the MongoDbContext as a Singleton service
 builder.Services.AddSingleton<MongoDbContext>();
@@ -32,6 +38,11 @@ builder.Services.AddScoped<SmartGrid.API.Services.ProsumerService>();
 
 //node service
 builder.Services.AddScoped<SmartGrid.API.Services.NodeService>();
+//reservation service
+//builder.Services.AddScoped<SmartGrid.API.Services.IReservationService, SmartGrid.API.Services.ReservationService>();
+//builder.Services.AddScoped<SmartGrid.API.Services.INodeGateway, SmartGrid.API.Services.NodeGateway>();
+//builder.Services.AddScoped<SmartGrid.API.Services.INodeGateway, SmartGrid.API.Services.FakeNodeGateway>();
+
 
 // Configure Swagger/OpenAPI for API documentation and testing
 
