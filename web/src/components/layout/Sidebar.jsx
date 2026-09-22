@@ -79,6 +79,11 @@ export default function Sidebar() {
           <span className="ml-auto bg-amber-500/10 text-amber-500 font-mono text-[10px] px-2 py-0.5 rounded-full">3</span>
         </NavLink>
 
+        <NavLink to="/admin/nodes" className={navItemClass}> {/* Microgrid Nodes */}
+          {Icons.Nodes || Icons.Dashboard} {/* Add a Nodes icon if you want */}
+          Microgrid Nodes
+        </NavLink>
+
         <NavLink to="/admin/users" className={navItemClass}>
           {Icons.Users}
           Web Users
