@@ -2,15 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { nodeService } from '../../api/nodeService';
 
 export default function NodeUpdateForm({ node, onClose, onSuccess }) {
-  // Initialize form state with current node data
   const [formData, setFormData] = useState({
     capacityKWh: '',
   });
   
-  // Schedule input field state (comma-separated string for easy editing)
   const [scheduleInput, setScheduleInput] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
 
   // Populate form when node prop changes
   useEffect(() => {
@@ -21,13 +20,14 @@ export default function NodeUpdateForm({ node, onClose, onSuccess }) {
       // Convert array to comma-separated string for editing
       setScheduleInput((node.schedule || []).join(', '));
       setError(null);
+      setSuccessMessage(null);
     }
   }, [node]);
 
-  // Parse comma-separated schedule string into array and save
   const handleSave = async (e) => {
     e.preventDefault();
     setError(null);
+    setSuccessMessage(null);
     
     // Validate capacity
     const capacity = parseFloat(formData.capacityKWh);
@@ -50,19 +50,40 @@ export default function NodeUpdateForm({ node, onClose, onSuccess }) {
         capacityKWh: capacity
       });
 
-      // 2. Update schedule via PATCH endpoint (separate as per backend API)
+      // 2. Update schedule via PATCH endpoint
       await nodeService.updateSchedule(node.id, parsedSchedule);
 
-      alert('Node details updated successfully!');
-      onSuccess(); // Refresh parent list and close modal
+      setSuccessMessage('Node details updated successfully!');
+      
+      // Delay closing to show success message
+      setTimeout(() => {
+        onSuccess();
+      }, 1500);
+      
     } catch (err) {
+      console.error('Update error:', err);
       setError(err.response?.data?.message || err.message || 'Failed to update node');
     } finally {
       setIsSaving(false);
     }
   };
 
-  if (!node) return null;
+  if (!node) {
+    return (
+      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="bg-slate-900 border border-red-500/50 rounded-2xl p-6 w-full max-w-md">
+          <h2 className="text-lg font-semibold text-white mb-4">Error</h2>
+          <p className="text-red-400 text-sm">Node data is not available.</p>
+          <button
+            onClick={onClose}
+            className="mt-4 w-full px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -78,6 +99,13 @@ export default function NodeUpdateForm({ node, onClose, onSuccess }) {
         {error && (
           <div className="bg-red-500/10 border border-red-500 text-red-400 px-4 py-3 rounded-lg mb-4 text-xs">
             {error}
+          </div>
+        )}
+
+        {/* Success Display */}
+        {successMessage && (
+          <div className="bg-teal-500/10 border border-teal-500 text-teal-400 px-4 py-3 rounded-lg mb-4 text-xs">
+            {successMessage}
           </div>
         )}
 
