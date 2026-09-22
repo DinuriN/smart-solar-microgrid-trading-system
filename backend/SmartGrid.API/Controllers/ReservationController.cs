@@ -1,10 +1,10 @@
 /*
  * File Name    : ReservationsController.cs
  * Description  : Prosumer-facing endpoints for creating, modifying and
- *                cancelling energy slot reservations.
+ *                cancelling and viewing (Reservation history,Counts) energy slot reservations.
  * Author       : Kandaudahewa C I
  * IT Number    : IT23453142
- * Date         : 2026-09-21
+ * Date         : 2026-09-22
  */
 
 using Microsoft.AspNetCore.Authorization;
@@ -98,6 +98,28 @@ namespace SmartGrid.API.Controllers
             {
                 return NotFound();
             }
+        }
+
+        /// <summary>Returns a prosumer's full booking history</summary>
+        [HttpGet("history/{nic}")]
+        [Authorize(Roles = "Prosumer")]
+        [ProducesResponseType(typeof(List<ReservationResponseDto>), 200)]
+        public async Task<IActionResult> GetHistory(string nic)
+        {
+            //Returns every reservation for this prosumer
+            var history = await _reservationService.GetHistoryAsync(nic);
+            return Ok(history);
+        }
+
+        /// <summary>Returns active/pending reservation counts for a prosumer</summary>
+        [HttpGet("counts/{nic}")]
+        [Authorize(Roles = "Prosumer")]
+        [ProducesResponseType(typeof(ReservationCountsDto), 200)]
+        public async Task<IActionResult> GetCounts(string nic)
+        {
+            //Active = Approved, Pending = awaiting Backoffice User approval
+            var counts = await _reservationService.GetCountsAsync(nic);
+            return Ok(counts);
         }
     }
 }
