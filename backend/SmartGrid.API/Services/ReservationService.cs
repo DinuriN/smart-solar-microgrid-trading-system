@@ -225,7 +225,7 @@ namespace SmartGrid.API.Services
 
 
         // ---------- SHARED SEARCH ----------
-        public async Task<List<ReservationResponseDto>> SearchAsync(string criteria, string requesterRole, string requesterNic, string? requesterOperatorId)
+        public async Task<List<ReservationResponseDto>> SearchAsync(string criteria, string requesterRole, string requesterNic, string? requesterOperatorId, string? status = null)
         {
             // Limit results to what the caller is allowed to see -> match the text
             var filterBuilder = Builders<EnergyReservation>.Filter;
@@ -248,11 +248,19 @@ namespace SmartGrid.API.Services
             var pattern = Regex.Escape(criteria ?? string.Empty);
             var textFilter = filterBuilder.Or(
                 filterBuilder.Regex(r => r.ProsumerNic, new MongoDB.Bson.BsonRegularExpression(pattern, "i")),
-                filterBuilder.Regex(r => r.NodeId, new MongoDB.Bson.BsonRegularExpression(pattern, "i"))
+                filterBuilder.Regex(r => r.NodeId, new MongoDB.Bson.BsonRegularExpression(pattern, "i")),
+                filterBuilder.Regex(r => r.BatterySlotId, new MongoDB.Bson.BsonRegularExpression(pattern, "i"))
             );
 
+            var finalFilter = scopeFilter & textFilter;
+
+            if (!string.IsNullOrWhiteSpace(status) && Enum.TryParse<ReservationStatus>(status, true, out var parsedStatus))
+            {
+                finalFilter &= filterBuilder.Eq(r => r.Status, parsedStatus);
+            }
+
             var results = await _db.Reservations
-                .Find(scopeFilter & textFilter)
+                .Find(finalFilter)
                 .SortByDescending(r => r.ScheduledDateTime)
                 .ToListAsync();
 
