@@ -1,11 +1,15 @@
 import React from 'react';
+import { usePageHeader } from '../../context/PageHeaderContext';
 
 export default function Topbar() {
+  const { header } = usePageHeader();
+
   return (
     <header className="h-16 border-b border-slate-800 flex items-center justify-between px-8 bg-slate-950/80 backdrop-blur-md sticky top-0 z-10">
-      
+
       <div>
-        {/* Pages will render their own big titles below the topbar to match the prototype's layout better */}
+        <div className="text-sm font-semibold text-white">{header.title}</div>
+        <div className="mt-0.5 font-mono text-[11px] text-slate-500">{header.breadcrumb}</div>
       </div>
 
       <div className="flex items-center">
