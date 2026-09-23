@@ -3,8 +3,10 @@ import { nodeService } from '../../api/nodeService';
 import { geocodingService } from '../../api/geocodingService';
 import BatterySlotManager from './BatterySlotManager';
 import NodeUpdateForm from './NodeUpdateForm';
+import { usePageHeader } from '../../context/PageHeaderContext';
 
 export default function NodesList() {
+    const { setHeader } = usePageHeader();
     const [nodes, setNodes] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -27,6 +29,10 @@ export default function NodesList() {
     const [isGeocoding, setIsGeocoding] = useState(false);
 
     useEffect(() => {
+        setHeader({
+            title: "Microgrid Nodes",
+            breadcrumb: "solara-grid / administration / nodes"
+        });
         fetchNodes();
     }, []);
 

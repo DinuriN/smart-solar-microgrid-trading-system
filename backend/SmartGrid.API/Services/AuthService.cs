@@ -48,13 +48,17 @@ namespace SmartGrid.API.Services
             var menu = new List<MenuItemDto>();
             if (user.Role == UserRole.BackOfficeUser)
             {
+                menu.Add(new MenuItemDto { Label = "Dashboard", Path = "/admin/dashboard", Icon = "dashboard" });
                 menu.Add(new MenuItemDto { Label = "Prosumers", Path = "/admin/prosumers", Icon = "users" });
+                menu.Add(new MenuItemDto { Label = "Microgrid Nodes", Path = "/admin/nodes", Icon = "nodes" });
                 menu.Add(new MenuItemDto { Label = "Web Users", Path = "/admin/users", Icon = "shield" });
+                menu.Add(new MenuItemDto { Label = "Reservations", Path = "/admin/reservations", Icon = "reservations" });
             }
             else if (user.Role == UserRole.GridOperator)
             {
-                menu.Add(new MenuItemDto { Label = "Microgrid Nodes", Path = "/admin/nodes", Icon = "nodes" });
-                menu.Add(new MenuItemDto { Label = "Reservations", Path = "/admin/reservations", Icon = "reservations" });
+                menu.Add(new MenuItemDto { Label = "Dashboard", Path = "/operator/dashboard", Icon = "dashboard" });
+                menu.Add(new MenuItemDto { Label = "Microgrid Nodes", Path = "/operator/nodes", Icon = "nodes" });
+                menu.Add(new MenuItemDto { Label = "Reservations", Path = "/operator/reservations", Icon = "reservations" });
             }
            
 

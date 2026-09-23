@@ -11,6 +11,7 @@ import ReservationsList from "./pages/admin/ReservationsList";
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Dashboard from './pages/admin/Dashboard';
 import { PageHeaderProvider } from './context/PageHeaderContext';
+import OperatorDashboard from './pages/admin/OperatorDashboard';
 
 
 function App() {
@@ -39,6 +40,14 @@ function App() {
               <Route path="reservations" element={<ReservationsList />} />
               <Route path="dashboard" element={<Dashboard />} />
                 
+            </Route>
+
+            {/* Operator Dashboard Layout */}
+            <Route path="/operator" element={<DashboardLayout />}>
+              <Route index element={<Navigate to="dashboard" replace />} />
+              <Route path="dashboard" element={<OperatorDashboard />} />
+              <Route path="nodes" element={<NodesList />} />
+              <Route path="reservations" element={<ReservationsList />} />
             </Route>
 
           </Route>

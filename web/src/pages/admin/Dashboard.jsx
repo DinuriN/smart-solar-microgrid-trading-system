@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getBackOfficeQueue } from '../../api/reservationService';
+import { usePageHeader } from '../../context/PageHeaderContext';
 
 const nodes = [
   {
@@ -50,6 +51,7 @@ function PanelHeader({ title, subtitle, action }) {
 }
 
 export default function Dashboard() {
+  const { setHeader } = usePageHeader();
   const navigate = useNavigate();
 
   const [pendingCount, setPendingCount] = useState('...');
@@ -57,6 +59,10 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setHeader({
+      title: "System Dashboard",
+      breadcrumb: "solara-grid / administration / dashboard"
+    });
     async function fetchDashboardData() {
       setLoading(true);
       try {
