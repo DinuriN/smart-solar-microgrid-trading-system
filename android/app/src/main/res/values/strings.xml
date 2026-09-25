@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">Solara Grid</string>
+
+    <!-- Login UI Strings -->
+    <string name="welcome_back">Welcome back</string>
+    <string name="login_subtitle">Reserve and manage your energy slots from anywhere.</string>
+    <string name="lbl_nic">NIC number</string>
+    <string name="hint_nic">e.g. 200015702134</string>
+    <string name="lbl_password">Password</string>
+    <string name="hint_password">••••••••</string>
+    <string name="btn_log_in">Log in</string>
+    <string name="new_here">New here? </string>
+    <string name="create_account">Create an account</string>
+
+    <!-- Register UI Strings -->
+    <string name="register_title">Join Solara Grid</string>
+    <string name="register_subtitle">Create an account to start trading energy.</string>
+    <string name="lbl_name">Full Name</string>
+    <string name="hint_name">e.g. John Doe</string>
+    <string name="lbl_email">Email Address</string>
+    <string name="hint_email">e.g. john@example.com</string>
+    <string name="lbl_phone">Phone Number</string>
+    <string name="hint_phone">e.g. 0771234567</string>
+    <string name="lbl_address">Home Address</string>
+    <string name="hint_address">e.g. 123 Solar Way, Colombo</string>
+    <string name="btn_register">Register</string>
+    <string name="already_have_account">Already have an account? </string>
+    <string name="log_in_now">Log in</string>
+</resources>
