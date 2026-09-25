@@ -154,22 +154,22 @@ namespace SmartGrid.API.Controllers
         [HttpGet("queue")]
         [Authorize(Roles = "BackOfficeUser")]
         [ProducesResponseType(typeof(List<ReservationResponseDto>), 200)]
-        public async Task<IActionResult> GetQueue()
+        public async Task<IActionResult> GetQueue([FromQuery] string? status)
         {
-            //Unscoped list of every reservation, sorted by scheduled time
-            var queue = await _reservationService.GetBackOfficeQueueAsync();
+            // Unscoped list of every reservation, sorted by scheduled time, optionally filtered by status
+            var queue = await _reservationService.GetBackOfficeQueueAsync(status);
             return Ok(queue);
         }
 
         /// <summary>Searches reservations scoped by the caller's role</summary>
         [HttpGet("search")]
         [ProducesResponseType(typeof(List<ReservationResponseDto>), 200)]
-        public async Task<IActionResult> Search([FromQuery] string criteria)
+        public async Task<IActionResult> Search([FromQuery] string criteria, [FromQuery] string? status)
         {
             //Grid Operator's own id, used to scope results to their nodes
             var operatorId = RequesterRole == "GridOperator" ? RequesterId : null;
 
-            var results = await _reservationService.SearchAsync(criteria, RequesterRole, RequesterNic, operatorId);
+            var results = await _reservationService.SearchAsync(criteria, RequesterRole, RequesterNic, operatorId, status);
             return Ok(results);
         }
     }

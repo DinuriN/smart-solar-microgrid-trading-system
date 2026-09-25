@@ -5,7 +5,6 @@ export default function Sidebar() {
 
 
   const navigate = useNavigate();
-  // SVG Icons
   const Icons = {
     dashboard: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-4 h-4 opacity-85 shrink-0">
@@ -22,6 +21,17 @@ export default function Sidebar() {
         <rect x="3" y="4" width="18" height="16" rx="2" /><path d="M7 9h10M7 13h6" />
       </svg>
     ),
+    nodes: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-4 h-4 opacity-85 shrink-0">
+        <circle cx="12" cy="12" r="3" /><circle cx="4" cy="6" r="2" /><circle cx="20" cy="6" r="2" /><circle cx="4" cy="18" r="2" /><circle cx="20" cy="18" r="2" />
+        <path d="M6 6.5l4 4M14 13.5l4 4M6 17.5l4-4M14 10.5l4-4" />
+      </svg>
+    ),
+    reservations: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-4 h-4 opacity-85 shrink-0">
+        <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01" />
+      </svg>
+    ),
   };
 
   const navItemClass = ({ isActive }) =>
@@ -31,10 +41,11 @@ export default function Sidebar() {
     }`;
 
 
-  // 3. FAT Backend: Get user details from localStorage
+  // FAT Backend: Get user details and dynamic menu from localStorage
   const userName = localStorage.getItem('userName') || 'User';
   const userRole = localStorage.getItem('userRole') || 'Role';
   const initial = userName.charAt(0).toUpperCase();
+  const menuItems = JSON.parse(localStorage.getItem('menu') || '[]');
 
 
   const handleLogout = () => {
@@ -61,29 +72,18 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* Navigation */}
+      {/* Dynamic Navigation - driven entirely by the backend menu response */}
       <nav className="flex-1 overflow-y-auto pb-4">
-
-        <div className="mb-2 mt-4 px-5 font-mono text-[10px] tracking-widest text-slate-500">OVERVIEW</div>
-
-        <NavLink to="/admin/dashboard" className={navItemClass}>
-          {Icons.dashboard}
-          Dashboard
-        </NavLink>
-
-        <div className="px-5 text-[10px] font-mono tracking-widest text-slate-500 mb-2 mt-4">ADMINISTRATION</div>
-
-        <NavLink to="/admin/prosumers" className={navItemClass}>
-          {Icons.Prosumers}
-          Prosumers
-          <span className="ml-auto bg-amber-500/10 text-amber-500 font-mono text-[10px] px-2 py-0.5 rounded-full">3</span>
-        </NavLink>
-
-        <NavLink to="/admin/users" className={navItemClass}>
-          {Icons.Users}
-          Web Users
-        </NavLink>
-
+        {menuItems.length === 0 ? (
+          <div className="px-5 text-[11px] text-slate-500 mt-4">No menu items assigned.</div>
+        ) : (
+          menuItems.map((item) => (
+            <NavLink to={item.path} key={item.label} className={navItemClass}>
+              {Icons[item.icon] || Icons.dashboard}
+              {item.label}
+            </NavLink>
+          ))
+        )}
       </nav>
 
       {/* Footer / User Profile */}
