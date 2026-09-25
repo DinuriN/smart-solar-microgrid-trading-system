@@ -9,12 +9,12 @@ import androidx.core.view.WindowInsetsCompat
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+        
+        // TODO: Later we will check SQLite UserManager to see if they are logged in.
+        // For now, immediately route to the Login Screen.
+        
+        val intent = android.content.Intent(this, com.example.solaragrid.ui.auth.LoginActivity::class.java)
+        startActivity(intent)
+        finish() // Close MainActivity so the user can't press 'Back' to return to a blank screen
     }
 }
