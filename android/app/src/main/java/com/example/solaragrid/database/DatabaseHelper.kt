@@ -4,6 +4,12 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
+// REFERENCE: The implementation of SQLiteOpenHelper for local database creation 
+// was adapted from the official Android Developers Guide.
+// Source: https://developer.android.com/training/data-storage/sqlite
+// The fundamental SQL queries (CREATE TABLE, DROP TABLE) were structured 
+// based on syntax learned from W3Schools SQL tutorials.
+// Source: https://www.w3schools.com/sql/
 class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     // A companion object 
