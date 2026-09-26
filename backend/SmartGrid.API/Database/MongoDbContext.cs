@@ -25,8 +25,14 @@ namespace SmartGrid.API.Database
             var client = new MongoClient(connectionString);
             _database = client.GetDatabase(databaseName);
         }
-// Expose the Users collection
+        // Expose the Users collection
         public IMongoCollection<User> Users => _database.GetCollection<User>("users");
+        // SolarMicroGrid collection & BatterySlot collection
+        public IMongoCollection<SolarMicroGrid> SolarMicroGrids => _database.GetCollection<SolarMicroGrid>("Solar_MicroGrid");
+        public IMongoCollection<BatterySlot> BatterySlots => _database.GetCollection<BatterySlot>("BatterySlot");
+
+//Expose the Reservations collection
+        public IMongoCollection<EnergyReservation> Reservations => _database.GetCollection<EnergyReservation>("reservations");
 
         public IMongoDatabase Database => _database;
     }

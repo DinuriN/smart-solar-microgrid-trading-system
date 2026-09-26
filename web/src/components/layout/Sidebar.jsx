@@ -64,12 +64,24 @@ export default function Sidebar() {
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto pb-4">
 
+        <div className="mb-2 mt-4 px-5 font-mono text-[10px] tracking-widest text-slate-500">OVERVIEW</div>
+
+        <NavLink to="/admin/dashboard" className={navItemClass}>
+          {Icons.dashboard}
+          Dashboard
+        </NavLink>
+
         <div className="px-5 text-[10px] font-mono tracking-widest text-slate-500 mb-2 mt-4">ADMINISTRATION</div>
 
         <NavLink to="/admin/prosumers" className={navItemClass}>
           {Icons.Prosumers}
           Prosumers
           <span className="ml-auto bg-amber-500/10 text-amber-500 font-mono text-[10px] px-2 py-0.5 rounded-full">3</span>
+        </NavLink>
+
+        <NavLink to="/admin/nodes" className={navItemClass}> {/* Microgrid Nodes */}
+          {Icons.Nodes || Icons.Dashboard} {/* Add a Nodes icon if you want */}
+          Microgrid Nodes
         </NavLink>
 
         <NavLink to="/admin/users" className={navItemClass}>
