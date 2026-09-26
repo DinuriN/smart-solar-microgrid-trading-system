@@ -38,6 +38,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.material)
     implementation("com.google.android.gms:play-services-code-scanner:16.1.0")
+    implementation("com.google.zxing:core:3.5.4")
     
     // Retrofit & Gson for Thin Client Network Calls
     implementation("com.squareup.retrofit2:retrofit:2.9.0")

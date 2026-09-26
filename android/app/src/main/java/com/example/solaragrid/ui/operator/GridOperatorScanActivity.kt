@@ -17,6 +17,14 @@ import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import androidx.core.content.ContextCompat
+import com.example.solaragrid.R
+import android.text.InputType
+import android.widget.EditText
+import android.graphics.Typeface
+import android.view.Gravity
+import android.view.ViewGroup
+import android.widget.FrameLayout
 
 class GridOperatorScanActivity : AppCompatActivity() {
 
@@ -34,11 +42,34 @@ class GridOperatorScanActivity : AppCompatActivity() {
         statusText = TextView(this).apply {
             text = "Scan a prosumer's transaction QR code."
             textSize = 18f
+            setTextColor(ContextCompat.getColor(this@GridOperatorScanActivity, R.color.text_primary))
         }
 
         val scanButton = Button(this).apply {
             text = "Scan QR code"
             setOnClickListener { scanQrCode() }
+        }
+
+        val qrInput = EditText(this).apply {
+            hint = "Paste QR code here (emulator test)"
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+            setSingleLine(true)
+            setTextColor(ContextCompat.getColor(this@GridOperatorScanActivity, R.color.text_primary))
+            setHintTextColor(ContextCompat.getColor(this@GridOperatorScanActivity, R.color.text_secondary))
+        }
+
+        val verifyEnteredButton = Button(this).apply {
+            text = "Verify entered code"
+            setOnClickListener {
+                val code = qrInput.text.toString().trim()
+                if (code.isBlank()) {
+                    statusText.text = "Paste a QR code first."
+                } else {
+                    verifiedReservationId = null
+                    finalizeButton.isEnabled = false
+                    verifyQrCode(code)
+                }
+            }
         }
 
         finalizeButton = Button(this).apply {
@@ -47,15 +78,53 @@ class GridOperatorScanActivity : AppCompatActivity() {
             setOnClickListener { finalizeTransfer() }
         }
 
-        val layout = LinearLayout(this).apply {
+        val gap = (20 * resources.displayMetrics.density).toInt()
+
+        val card = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(32, 48, 32, 32)
+            gravity = Gravity.CENTER_HORIZONTAL
+            setPadding(gap, gap * 2, gap, gap * 2)
+            setBackgroundColor(
+                ContextCompat.getColor(this@GridOperatorScanActivity, R.color.bg_input)
+            )
+
+            addView(TextView(this@GridOperatorScanActivity).apply {
+                text = "Verify energy transfer"
+                textSize = 22f
+                gravity = Gravity.CENTER
+                setTypeface(null, Typeface.BOLD)
+                setTextColor(
+                    ContextCompat.getColor(this@GridOperatorScanActivity, R.color.text_primary)
+                )
+            })
+
+            statusText.setPadding(0, gap, 0, 0)
             addView(statusText)
-            addView(scanButton)
-            addView(finalizeButton)
+
+            addView(scanButton, LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).apply { topMargin = gap })
+
+            addView(finalizeButton, LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).apply { topMargin = gap / 2 })
         }
 
-        setContentView(layout)
+        val screen = FrameLayout(this).apply {
+            setBackgroundColor(
+                ContextCompat.getColor(this@GridOperatorScanActivity, R.color.bg_dark)
+            )
+            addView(card, FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                Gravity.CENTER
+            ).apply { setMargins(gap, 0, gap, 0) })
+        }
+        setContentView(screen)
+
+//        setContentView(layout)
     }
 
     private fun scanQrCode() {

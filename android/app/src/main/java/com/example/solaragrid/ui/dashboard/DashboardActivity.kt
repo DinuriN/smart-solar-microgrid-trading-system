@@ -8,6 +8,7 @@ import com.example.solaragrid.database.UserManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import android.content.Intent
 import com.example.solaragrid.ui.operator.GridOperatorScanActivity
+import com.example.solaragrid.ui.prosumer.ProsumerQrFragment
 
 class DashboardActivity : AppCompatActivity() {
 
@@ -61,6 +62,7 @@ class DashboardActivity : AppCompatActivity() {
                     R.id.nav_map -> loadFragment(ComingSoonFragment.newInstance("Map"))
                     R.id.nav_bookings -> loadFragment(ComingSoonFragment.newInstance("Bookings"))
                     R.id.nav_profile -> loadFragment(ProsumerProfileFragment())
+                    R.id.nav_qr -> loadFragment(ProsumerQrFragment())
                 }
                 true
             }

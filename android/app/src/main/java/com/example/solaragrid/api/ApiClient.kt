@@ -9,7 +9,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 // creates a singleton Retrofit instance.
 object ApiClient {
     //special IP that tells the Android Emulator to connect to Mac's localhost.
-    private const val BASE_URL = "http://10.0.2.2:5000/"
+//    private const val BASE_URL = "http://10.0.2.2:5000/" //- temp change - dinuri
+    private const val BASE_URL = "http://127.0.0.1:5000/"
 
     private var retrofit: Retrofit? = null
 
