@@ -15,6 +15,7 @@ using SmartGrid.API.Models;
 using SmartGrid.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using MongoDB.Bson;
 
 namespace SmartGrid.API.Controllers
 {
@@ -182,6 +183,15 @@ namespace SmartGrid.API.Controllers
 
             if (reservation.QrCode?.VerifiedBy != OperatorId)
                 return StatusCode(403, new { success = false, message = "Another operator verified this QR code." });
+
+            if (!ObjectId.TryParse(reservation.BatterySlotId, out _))
+            {
+                return Conflict(new
+                {
+                    success = false,
+                    message = "This reservation has an invalid battery slot ID."
+                });
+            }
 
             bool updated = await _gridOperationsService
             .CompleteTransferAndReleaseSlotAsync(request.ReservationId, OperatorId!);
