@@ -6,6 +6,9 @@ import androidx.fragment.app.Fragment
 import com.example.solaragrid.R
 import com.example.solaragrid.database.UserManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import android.content.Intent
+import com.example.solaragrid.ui.operator.GridOperatorScanActivity
+import com.example.solaragrid.ui.prosumer.ProsumerQrFragment
 
 class DashboardActivity : AppCompatActivity() {
 
@@ -20,7 +23,7 @@ class DashboardActivity : AppCompatActivity() {
         val user = UserManager(this).getLoggedInUser()
         val role = user?.role ?: ""
 
-        if (role == "GridOperator") {
+        if (role.equals("GridOperator", ignoreCase = true)) {
             //OPERATOR MODE
             bottomNav.inflateMenu(R.menu.bottom_nav_operator)
             loadFragment(OperatorHomeFragment())
@@ -30,10 +33,22 @@ class DashboardActivity : AppCompatActivity() {
             // Source: https://www.geeksforgeeks.org/bottom-navigation-bar-in-android/
             bottomNav.setOnItemSelectedListener { item ->
                 when (item.itemId) {
-                    R.id.nav_op_home -> loadFragment(OperatorHomeFragment())
-                    R.id.nav_op_scan -> loadFragment(ComingSoonFragment.newInstance("Scan QR"))
+                    R.id.nav_op_home -> {
+                        if (supportFragmentManager.findFragmentById(R.id.fragment_container)
+                                    !is OperatorHomeFragment
+                        ) {
+                            loadFragment(OperatorHomeFragment())
+                        }
+                        true
+                    }
+
+                    R.id.nav_op_scan -> {
+                        startActivity(Intent(this, GridOperatorScanActivity::class.java))
+                        false // Keep Home selected when returning from the scanner
+                    }
+
+                    else -> false
                 }
-                true
             }
         } else {
             //PROSUMER MODE
@@ -47,6 +62,7 @@ class DashboardActivity : AppCompatActivity() {
                     R.id.nav_map -> loadFragment(ComingSoonFragment.newInstance("Map"))
                     R.id.nav_bookings -> loadFragment(ComingSoonFragment.newInstance("Bookings"))
                     R.id.nav_profile -> loadFragment(ProsumerProfileFragment())
+                    R.id.nav_qr -> loadFragment(ProsumerQrFragment())
                 }
                 true
             }

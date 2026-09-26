@@ -19,6 +19,8 @@ import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import android.content.Intent
+import com.example.solaragrid.ui.operator.GridOperatorScanActivity
 
 class LoginActivity : AppCompatActivity() {
 

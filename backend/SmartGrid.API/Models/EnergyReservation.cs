@@ -38,6 +38,9 @@ namespace SmartGrid.API.Models
 
         [BsonElement("verifiedAt")]
         public DateTime? VerifiedAt { get; set; }
+
+        [BsonElement("verifiedBy")]
+        public string? VerifiedBy { get; set; }
     }
 
     public class EnergyReservation
@@ -78,5 +81,9 @@ namespace SmartGrid.API.Models
 
         [BsonElement("updatedAt")]
         public DateTime? UpdatedAt { get; set; }
+
+        //store operator id: verified by
+        [BsonElement("verifiedBy")]
+        public string? VerifiedBy { get; set; }
     }
 }
