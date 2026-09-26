@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { webUserService } from '../../api/webUserService';
+import { usePageHeader } from '../../context/PageHeaderContext';
 
 export default function WebUsersList() {
+  const { setHeader } = usePageHeader();
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,6 +18,10 @@ export default function WebUsersList() {
 
 
   useEffect(() => {
+    setHeader({
+      title: "Web Users Directory",
+      breadcrumb: "solara-grid / administration / web users"
+    });
     fetchUsers();
   }, []);
 

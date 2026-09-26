@@ -41,11 +41,17 @@ builder.Services.AddScoped<SmartGrid.API.Services.GridOperationsService>();
 
 // Node service
 builder.Services.AddScoped<SmartGrid.API.Services.NodeService>();
+<<<<<<< HEAD
 
 // Reservation services (currently disabled)
 // builder.Services.AddScoped<SmartGrid.API.Services.IReservationService, SmartGrid.API.Services.ReservationService>();
 // builder.Services.AddScoped<SmartGrid.API.Services.INodeGateway, SmartGrid.API.Services.NodeGateway>();
 // builder.Services.AddScoped<SmartGrid.API.Services.INodeGateway, SmartGrid.API.Services.FakeNodeGateway>();
+=======
+//reservation service
+builder.Services.AddScoped<SmartGrid.API.Services.IReservationService, SmartGrid.API.Services.ReservationService>();
+builder.Services.AddScoped<SmartGrid.API.Services.INodeGateway, SmartGrid.API.Services.NodeGateway>();
+>>>>>>> development
 
 
 // Configure Swagger/OpenAPI for API documentation and testing
