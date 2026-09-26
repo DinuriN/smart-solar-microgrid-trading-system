@@ -34,10 +34,11 @@
             android:name=".ui.auth.RegisterActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
-
+            
         <activity
-            android:name=".ui.operator.GridOperatorScanActivity"
-            android:exported="false" />
+            android:name=".ui.dashboard.DashboardActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

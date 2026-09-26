@@ -7,6 +7,9 @@ import android.database.Cursor
 // A simple data class to hold the retrieved user info
 data class LocalUser(val token: String, val role: String, val name: String, val nic: String?)
 
+// REFERENCE: The logic for inserting (ContentValues) and querying data (Cursor) 
+// securely from the SQLite database was adapted from standard Android tutorials.
+// Source: https://developer.android.com/training/data-storage/sqlite
 class UserManager(context: Context) {
     //create an instance of our DatabaseHelper
     private val dbHelper = DatabaseHelper(context)
@@ -52,7 +55,7 @@ class UserManager(context: Context) {
             val name = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_NAME))
             val nic = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_NIC)) // Get the NIC!
             
-            // Create our data class object
+            // Create data class object
             user = LocalUser(token, role, name, nic)
         }
         

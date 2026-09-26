@@ -14,16 +14,21 @@ object ApiClient {
     private var retrofit: Retrofit? = null
 
     //pass Context so we can access SQLite through UserManager
+    // REFERENCE: The setup for the Retrofit Builder and OkHttpClient was adapted 
+    // from the official Retrofit documentation and generic REST API tutorials.
+    // Source: https://android-app-development-documentation.readthedocs.io/en/latest/retrofit.html
+
+
     fun getClient(context: Context): Retrofit {
         if (retrofit == null) {
             
             // OkHttpClient acts as the middleman for our HTTP requests.
             val okHttpClient = OkHttpClient.Builder()
                 .addInterceptor { chain ->
-                    // This block runs automatically for EVERY request we send.
+                    // This block runs automatically for EVERY request.
                     val requestBuilder = chain.request().newBuilder()
                     
-                    // We grab the saved JWT token from our local SQLite database
+                    //grab the saved JWT token from our local SQLite database
                     val token = UserManager(context).getToken()
                     
                     // If the user is logged in (token is not empty), attach it as a Bearer header!

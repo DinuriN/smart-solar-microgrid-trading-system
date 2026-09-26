@@ -14,6 +14,7 @@ import com.example.solaragrid.database.UserManager
 import com.example.solaragrid.models.ApiResponse
 import com.example.solaragrid.models.AuthResponseDto
 import com.example.solaragrid.models.LoginDto
+import com.example.solaragrid.ui.dashboard.DashboardActivity
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
@@ -26,7 +27,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // Hide the default Android top bar to match your dark custom UI
+        // Hide the default Android top bar
         supportActionBar?.hide() 
         
         setContentView(R.layout.activity_login)
@@ -42,7 +43,7 @@ class LoginActivity : AppCompatActivity() {
             val nic = etNic.text.toString().trim()
             val password = etPassword.text.toString().trim()
 
-            // Basic validation
+            // validation
             if (nic.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Please enter both NIC and Password", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -59,7 +60,10 @@ class LoginActivity : AppCompatActivity() {
                         val authData = response.body()?.data
                         if (authData != null) {
                             
-                            // 3. Decode the JWT payload to get the true NIC
+                            // REFERENCE: The C# backend does not return the NIC in the JSON response body.
+                            // To extract the NIC,researched how to decode the JWT payload string locally.
+                            // The Base64 decoding approach was adapted from a StackOverflow discussion:
+                            // Source: https://stackoverflow.com/questions/37695877/how-can-i-decode-jwt-token-in-android
                             var extractedNic = nic
                             try {
                                 val split = authData.token.split(".")
@@ -72,17 +76,15 @@ class LoginActivity : AppCompatActivity() {
                                 }
                             } catch (e: Exception) { e.printStackTrace() }
                             
-                            // 4. Save to our local SQLite Database (UserManager)
+                            // 4. Save to local SQLite Database (UserManager)
                             UserManager(this@LoginActivity).saveUser(authData.token, authData.role, authData.name, extractedNic)
                             
                             Toast.makeText(this@LoginActivity, "Login Successful! Welcome, ${authData.name}", Toast.LENGTH_LONG).show()
-
-                            if (authData.role.equals("GridOperator", ignoreCase = true)) {
-                                startActivity(
-                                    Intent(this@LoginActivity, GridOperatorScanActivity::class.java)
-                                )
-                                finish()
-                            }
+                            
+                            // Navigate to Dashboard
+                            val intent = android.content.Intent(this@LoginActivity, DashboardActivity::class.java)
+                            startActivity(intent)
+                            finish()
                         }
                     } else {
                         Toast.makeText(this@LoginActivity, "Login Failed. Invalid credentials.", Toast.LENGTH_LONG).show()
