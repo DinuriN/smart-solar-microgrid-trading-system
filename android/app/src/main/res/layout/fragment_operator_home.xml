@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_dark"
+    android:padding="24dp">
+
+    <!-- Subtitle -->
+    <TextView
+        android:id="@+id/tvOpSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Grid Operator"
+        android:textColor="@color/text_secondary"
+        android:textSize="14sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Operator Name -->
+    <TextView
+        android:id="@+id/tvOpName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Operator Name"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginTop="4dp"
+        app:layout_constraintTop_toBottomOf="@id/tvOpSubtitle"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Avatar Circle (Logout Button) -->
+    <TextView
+        android:id="@+id/btnAvatar"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/rounded_icon_bg"
+        android:backgroundTint="#1F2937"
+        android:text="MR"
+        android:textColor="#38BDF8"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Rest of the dashboard (Placeholder) -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Dashboard data coming soon..."
+        android:textColor="@color/text_secondary"
+        app:layout_constraintTop_toBottomOf="@id/tvOpName"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
