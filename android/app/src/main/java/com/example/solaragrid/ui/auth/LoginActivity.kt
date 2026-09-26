@@ -18,6 +18,8 @@ import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import android.content.Intent
+import com.example.solaragrid.ui.operator.GridOperatorScanActivity
 
 class LoginActivity : AppCompatActivity() {
 
@@ -74,7 +76,13 @@ class LoginActivity : AppCompatActivity() {
                             UserManager(this@LoginActivity).saveUser(authData.token, authData.role, authData.name, extractedNic)
                             
                             Toast.makeText(this@LoginActivity, "Login Successful! Welcome, ${authData.name}", Toast.LENGTH_LONG).show()
-                            // TODO: Next step - route to Dashboard
+
+                            if (authData.role.equals("GridOperator", ignoreCase = true)) {
+                                startActivity(
+                                    Intent(this@LoginActivity, GridOperatorScanActivity::class.java)
+                                )
+                                finish()
+                            }
                         }
                     } else {
                         Toast.makeText(this@LoginActivity, "Login Failed. Invalid credentials.", Toast.LENGTH_LONG).show()
