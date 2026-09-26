@@ -13,14 +13,21 @@ using Microsoft.AspNetCore.Mvc;
 using SmartGrid.API.DTOs.GridOperations;
 using SmartGrid.API.Models;
 using SmartGrid.API.Services;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace SmartGrid.API.Controllers
 {
     [ApiController]
     [Route("api/qr")]
+    [Authorize(Roles = "GridOperator")]
     public class QrController : ControllerBase
     {
         private readonly GridOperationsService _gridOperationsService;
+
+        private string? OperatorId =>
+            User.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? User.FindFirstValue("sub");
 
         // Initializes the controller with the Grid Operations service.
         public QrController(GridOperationsService gridOperationsService)
@@ -42,7 +49,7 @@ namespace SmartGrid.API.Controllers
                 });
             }
 
-            if (string.IsNullOrWhiteSpace(request.OperatorId))
+            if (string.IsNullOrWhiteSpace(OperatorId))
             {
                 return BadRequest(new
                 {
@@ -90,7 +97,7 @@ namespace SmartGrid.API.Controllers
             bool updated =
                 await _gridOperationsService.VerifyQrCodeAsync(
                     request.QrCode,
-                    request.OperatorId,
+                    OperatorId,
                     verifiedAt);
 
             if (!updated)
@@ -107,7 +114,7 @@ namespace SmartGrid.API.Controllers
                 verified = true,
                 reservationId = reservation.Id,
                 status = reservation.Status,
-                verifiedBy = request.OperatorId,
+                verifiedBy = OperatorId,
                 verifiedAt = verifiedAt,
                 message = "QR code verified successfully."
             });
@@ -127,7 +134,7 @@ namespace SmartGrid.API.Controllers
                 });
             }
 
-            if (string.IsNullOrWhiteSpace(request.OperatorId))
+            if (string.IsNullOrWhiteSpace(OperatorId))
             {
                 return BadRequest(new
                 {
@@ -170,11 +177,14 @@ namespace SmartGrid.API.Controllers
                 });
             }
 
-            bool updated =
-                await _gridOperationsService
-                    .UpdateReservationStatusAsync(
-                        request.ReservationId,
-                        ReservationStatus.Completed);
+            if (reservation.Status != ReservationStatus.Approved)
+                return BadRequest(new { success = false, message = "Reservation is not approved." });
+
+            if (reservation.QrCode?.VerifiedBy != OperatorId)
+                return StatusCode(403, new { success = false, message = "Another operator verified this QR code." });
+
+            bool updated = await _gridOperationsService
+            .CompleteTransferAndReleaseSlotAsync(request.ReservationId, OperatorId!);
 
             if (!updated)
             {
@@ -197,7 +207,7 @@ namespace SmartGrid.API.Controllers
                 success = true,
                 reservationId = request.ReservationId,
                 reservationStatus = "Completed",
-                finalizedBy = request.OperatorId,
+                finalizedBy = OperatorId,
                 finalizedAt = DateTime.UtcNow,
                 message = "Energy transfer finalized successfully."
             });

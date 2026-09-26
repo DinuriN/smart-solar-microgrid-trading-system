@@ -11,6 +11,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SmartGrid.API.Models;
 using SmartGrid.API.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SmartGrid.API.Controllers
 {
@@ -93,6 +94,27 @@ namespace SmartGrid.API.Controllers
                 generatedAt = generatedAt,
                 message = "QR code generated successfully."
             });
+        }
+
+        // Allows a Backoffice user to approve a pending reservation.
+        [HttpPatch("{id}/approve")]
+        [Authorize(Roles = "BackOfficeUser")]
+        public async Task<IActionResult> ApproveReservation(string id)
+        {
+            var reservation = await _gridOperationsService.GetByReservationIdAsync(id);
+
+            if (reservation == null)
+                return NotFound(new { message = "Reservation not found." });
+
+            if (reservation.Status != ReservationStatus.Pending)
+                return Conflict(new { message = "Only pending reservations can be approved." });
+
+            var approved = await _gridOperationsService.ApprovePendingReservationAsync(id);
+
+            if (!approved)
+                return Conflict(new { message = "Reservation status changed. Refresh and try again." });
+
+            return Ok(new { success = true, reservationId = id, status = "Approved" });
         }
     }
 }

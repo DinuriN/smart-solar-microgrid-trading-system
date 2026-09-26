@@ -38,6 +38,9 @@ namespace SmartGrid.API.Models
 
         [BsonElement("verifiedAt")]
         public DateTime? VerifiedAt { get; set; }
+
+        [BsonElement("verifiedBy")]
+        public string? VerifiedBy { get; set; }
     }
 
     public class EnergyReservation
