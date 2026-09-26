@@ -78,5 +78,9 @@ namespace SmartGrid.API.Models
 
         [BsonElement("updatedAt")]
         public DateTime? UpdatedAt { get; set; }
+
+        //store operator id: verified by
+        [BsonElement("verifiedBy")]
+        public string? VerifiedBy { get; set; }
     }
 }

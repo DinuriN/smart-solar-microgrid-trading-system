@@ -9,6 +9,7 @@
  */
 
 using Microsoft.AspNetCore.Mvc;
+using SmartGrid.API.Models;
 using SmartGrid.API.Services;
 
 namespace SmartGrid.API.Controllers
@@ -42,7 +43,7 @@ namespace SmartGrid.API.Controllers
 
             var reservation =
                 await _gridOperationsService
-                    .GetByReservationCodeAsync(id);
+                    .GetByReservationIdAsync(id);
 
             if (reservation == null)
             {
@@ -54,10 +55,7 @@ namespace SmartGrid.API.Controllers
             }
 
             // TODO: Confirm the final reservation status values with Member 3.
-            if (!string.Equals(
-                reservation.Status,
-                "Approved",
-                StringComparison.OrdinalIgnoreCase))
+            if (reservation.Status != ReservationStatus.Approved)
             {
                 return BadRequest(new
                 {

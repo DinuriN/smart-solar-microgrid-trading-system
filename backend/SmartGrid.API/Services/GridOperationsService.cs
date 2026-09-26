@@ -9,6 +9,7 @@
  * Date         : 2026-09-20
  */
 
+using MongoDB.Bson;
 using MongoDB.Driver;
 using SmartGrid.API.Database;
 using SmartGrid.API.DTOs.GridOperations;
@@ -20,106 +21,97 @@ namespace SmartGrid.API.Services
     {
         private readonly IMongoCollection<EnergyReservation> _reservations;
 
-        // Initializes access to the temporary shared EnergyReservation collection
         public GridOperationsService(MongoDbContext context)
         {
-            // TODO: Confirm the final collection name with Member 3.
-            _reservations =
-                context.Database.GetCollection<EnergyReservation>(
-                    "energyReservations");
+            _reservations = context.Reservations;
         }
 
-        // Retrieves a reservation using its reservation code.
-        public async Task<EnergyReservation?> GetByReservationCodeAsync(
-            string reservationCode)
+        public async Task<EnergyReservation?> GetByReservationIdAsync(string id)
         {
+            if (!ObjectId.TryParse(id, out _))
+                return null;
+
             return await _reservations
-                .Find(r => r.ReservationCode == reservationCode)
+                .Find(r => r.Id == id)
                 .FirstOrDefaultAsync();
         }
 
-        // Stores a newly generated QR code against a reservation.
         public async Task<bool> UpdateQrCodeAsync(
-            string reservationCode,
-            string qrCode,
-            DateTime generatedAt)
+            string id, string qrCode, DateTime generatedAt)
         {
+            if (!ObjectId.TryParse(id, out _))
+                return false;
+
             var update = Builders<EnergyReservation>.Update
-                .Set(r => r.QrCode.Code, qrCode)
-                .Set(r => r.QrCode.GeneratedAt, generatedAt);
+                .Set(r => r.QrCode, new QrInfo
+                {
+                    Code = qrCode,
+                    GeneratedAt = generatedAt
+                })
+                .Set(r => r.UpdatedAt, DateTime.UtcNow);
 
             var result = await _reservations.UpdateOneAsync(
-                r => r.ReservationCode == reservationCode,
+                r => r.Id == id
+                    && r.Status == ReservationStatus.Approved
+                    && r.QrCode == null,
                 update);
 
             return result.ModifiedCount > 0;
         }
 
-        // Retrieves a reservation using its generated QR code.
-        public async Task<EnergyReservation?> GetByQrCodeAsync(
-            string qrCode)
+        public async Task<EnergyReservation?> GetByQrCodeAsync(string qrCode)
         {
             return await _reservations
-                .Find(r => r.QrCode.Code == qrCode)
+                .Find(r => r.QrCode != null && r.QrCode.Code == qrCode)
                 .FirstOrDefaultAsync();
         }
 
-        // Records successful QR verification details.
         public async Task<bool> VerifyQrCodeAsync(
-            string qrCode,
-            string operatorId,
-            DateTime verifiedAt)
+            string qrCode, string operatorId, DateTime verifiedAt)
         {
             var update = Builders<EnergyReservation>.Update
-                .Set(r => r.QrCode.VerifiedAt, verifiedAt)
-                .Set(r => r.QrCode.VerifiedBy, operatorId);
+                .Set("qrCode.verifiedAt", verifiedAt)
+                .Set("qrCode.verifiedBy", operatorId)
+                .Set(r => r.UpdatedAt, DateTime.UtcNow);
 
             var result = await _reservations.UpdateOneAsync(
-                r => r.QrCode.Code == qrCode,
+                r => r.QrCode != null
+                    && r.QrCode.Code == qrCode
+                    && r.QrCode.VerifiedAt == null
+                    && r.Status == ReservationStatus.Approved,
                 update);
 
             return result.ModifiedCount > 0;
         }
 
-        // Updates the status of an energy reservation.
         public async Task<bool> UpdateReservationStatusAsync(
-            string reservationCode,
-            string status)
+            string id, ReservationStatus status)
         {
+            if (!ObjectId.TryParse(id, out _))
+                return false;
+
             var update = Builders<EnergyReservation>.Update
-                .Set(r => r.Status, status);
+                .Set(r => r.Status, status)
+                .Set(r => r.UpdatedAt, DateTime.UtcNow);
 
             var result = await _reservations.UpdateOneAsync(
-                r => r.ReservationCode == reservationCode,
+                r => r.Id == id
+                    && r.Status == ReservationStatus.Approved
+                    && r.QrCode != null
+                    && r.QrCode.VerifiedAt != null,
                 update);
 
             return result.ModifiedCount > 0;
         }
 
-        // Retrieves operational dashboard statistics from MongoDB.
         public async Task<DashboardStatsResponseDto> GetDashboardStatsAsync()
         {
-            var pendingFilter =
-                Builders<EnergyReservation>.Filter.Eq(
-                    r => r.Status,
-                    "Pending");
+            var pendingCount = await _reservations.CountDocumentsAsync(
+                r => r.Status == ReservationStatus.Pending);
 
-            var approvedFutureFilter =
-                Builders<EnergyReservation>.Filter.And(
-                    Builders<EnergyReservation>.Filter.Eq(
-                        r => r.Status,
-                        "Approved"),
-                    Builders<EnergyReservation>.Filter.Gt(
-                        r => r.ScheduledDateTime,
-                        DateTime.UtcNow)
-                );
-
-            var pendingCount =
-                await _reservations.CountDocumentsAsync(pendingFilter);
-
-            var approvedFutureCount =
-                await _reservations.CountDocumentsAsync(
-                    approvedFutureFilter);
+            var approvedFutureCount = await _reservations.CountDocumentsAsync(
+                r => r.Status == ReservationStatus.Approved
+                    && r.ScheduledDateTime > DateTime.UtcNow);
 
             return new DashboardStatsResponseDto
             {

@@ -11,6 +11,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using SmartGrid.API.DTOs.GridOperations;
+using SmartGrid.API.Models;
 using SmartGrid.API.Services;
 
 namespace SmartGrid.API.Controllers
@@ -64,10 +65,7 @@ namespace SmartGrid.API.Controllers
             }
 
             // TODO: Confirm the final reservation status values with Member 3.
-            if (!string.Equals(
-                reservation.Status,
-                "Approved",
-                StringComparison.OrdinalIgnoreCase))
+            if (reservation.Status != ReservationStatus.Approved)
             {
                 return BadRequest(new
                 {
@@ -77,7 +75,7 @@ namespace SmartGrid.API.Controllers
                 });
             }
 
-            if (reservation.QrCode.VerifiedAt != null)
+            if (reservation.QrCode?.VerifiedAt != null)
             {
                 return BadRequest(new
                 {
@@ -107,7 +105,7 @@ namespace SmartGrid.API.Controllers
             return Ok(new
             {
                 verified = true,
-                reservationId = reservation.ReservationCode,
+                reservationId = reservation.Id,
                 status = reservation.Status,
                 verifiedBy = request.OperatorId,
                 verifiedAt = verifiedAt,
@@ -140,7 +138,7 @@ namespace SmartGrid.API.Controllers
 
             var reservation =
                 await _gridOperationsService
-                    .GetByReservationCodeAsync(request.ReservationId);
+                    .GetByReservationIdAsync(request.ReservationId);
 
             if (reservation == null)
             {
@@ -151,7 +149,7 @@ namespace SmartGrid.API.Controllers
                 });
             }
 
-            if (reservation.QrCode.VerifiedAt == null)
+            if (reservation.QrCode?.VerifiedAt == null)
             {
                 return BadRequest(new
                 {
@@ -162,10 +160,7 @@ namespace SmartGrid.API.Controllers
             }
 
             // TODO: Confirm the final reservation status values with Member 3.
-            if (string.Equals(
-                reservation.Status,
-                "Completed",
-                StringComparison.OrdinalIgnoreCase))
+            if (reservation.Status == ReservationStatus.Completed)
             {
                 return BadRequest(new
                 {
@@ -179,7 +174,7 @@ namespace SmartGrid.API.Controllers
                 await _gridOperationsService
                     .UpdateReservationStatusAsync(
                         request.ReservationId,
-                        "Completed");
+                        ReservationStatus.Completed);
 
             if (!updated)
             {
