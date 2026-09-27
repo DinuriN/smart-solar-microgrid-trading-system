@@ -8,8 +8,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 // creates a singleton Retrofit instance.
 object ApiClient {
-    //special IP that tells the Android Emulator to connect to Mac's localhost.
-    private const val BASE_URL = "http://10.0.2.2:5000/"
+    // We now read the Base URL dynamically from local.properties -> BuildConfig
+    private const val BASE_URL = com.example.solaragrid.BuildConfig.API_BASE_URL
 
     private var retrofit: Retrofit? = null
 
