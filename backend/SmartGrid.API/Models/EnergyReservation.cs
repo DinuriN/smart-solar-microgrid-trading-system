@@ -28,6 +28,7 @@ namespace SmartGrid.API.Models
     }
 
     // Nested QR subdocument
+    [BsonIgnoreExtraElements]
     public class QrInfo
     {
         [BsonElement("code")]
