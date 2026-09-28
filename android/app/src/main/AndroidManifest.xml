@@ -47,6 +47,11 @@
 
         <!-- [Member 3] Reservation screens -->
         <activity
+            android:name=".ui.reservation.ReservationFormActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
             android:name=".ui.reservation.BookingSummaryActivity"
             android:exported="false" />
     </application>
