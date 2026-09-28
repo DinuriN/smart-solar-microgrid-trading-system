@@ -9,6 +9,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import android.content.Intent
 import com.example.solaragrid.ui.operator.GridOperatorScanActivity
 import com.example.solaragrid.ui.prosumer.ProsumerQrFragment
+import com.example.solaragrid.ui.reservation.ProsumerHomeFragment
 
 class DashboardActivity : AppCompatActivity() {
 
@@ -55,11 +56,11 @@ class DashboardActivity : AppCompatActivity() {
         } else {
             //PROSUMER MODE
             bottomNav.inflateMenu(R.menu.bottom_nav_prosumer)
-            loadFragment(ComingSoonFragment.newInstance("Home"))
+            loadFragment(ProsumerHomeFragment()) // [Member 3] was ComingSoonFragment("Home")
 
             bottomNav.setOnItemSelectedListener { item ->
                 when (item.itemId) {
-                    R.id.nav_home -> loadFragment(ComingSoonFragment.newInstance("Home"))
+                    R.id.nav_home -> loadFragment(ProsumerHomeFragment())         // [Member 3]
                     R.id.nav_map -> loadFragment(ComingSoonFragment.newInstance("Map"))
                     R.id.nav_bookings -> loadFragment(ComingSoonFragment.newInstance("Bookings"))
                     R.id.nav_profile -> loadFragment(ProsumerProfileFragment())
@@ -89,7 +90,7 @@ class DashboardActivity : AppCompatActivity() {
         val nav = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         val target = if (tab == "bookings") R.id.nav_bookings else R.id.nav_home
         if (nav.selectedItemId == target) {
-            loadFragment(ComingSoonFragment.newInstance(if (tab == "bookings") "Bookings" else "Home"))
+            loadFragment(if (tab == "bookings") ComingSoonFragment.newInstance("Bookings") else ProsumerHomeFragment())
         } else {
             nav.selectedItemId = target
         }
