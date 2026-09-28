@@ -13,6 +13,7 @@ import Dashboard from './pages/admin/Dashboard';
 import { PageHeaderProvider } from './context/PageHeaderContext';
 import OperatorDashboard from './pages/admin/OperatorDashboard';
 import Home from './pages/Home';
+import VerifyQrPage from './pages/admin/VerifyQrPage';
 
 
 function App() {
@@ -51,6 +52,7 @@ function App() {
               <Route path="dashboard" element={<OperatorDashboard />} />
               <Route path="nodes" element={<NodesList />} />
               <Route path="reservations" element={<ReservationsList />} />
+              <Route path="qr" element={<VerifyQrPage />} />
             </Route>
 
           </Route>

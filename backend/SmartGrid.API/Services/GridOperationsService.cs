@@ -221,5 +221,39 @@ namespace SmartGrid.API.Services
 
             return result.ModifiedCount == 1;
         }
+
+        public async Task<List<EnergyReservation>> FindApprovedQrReservationsAsync(
+    string criteria)
+{
+    if (string.IsNullOrWhiteSpace(criteria))
+        return new List<EnergyReservation>();
+
+    var search = criteria.Trim();
+    var filters = Builders<EnergyReservation>.Filter;
+    var pattern = new BsonRegularExpression(
+        System.Text.RegularExpressions.Regex.Escape(search), "i");
+
+    var matches = new List<FilterDefinition<EnergyReservation>>
+    {
+        filters.Regex(r => r.ProsumerNic, pattern),
+        filters.Regex(r => r.NodeId, pattern),
+        filters.Regex(r => r.BatterySlotId, pattern)
+    };
+
+    if (ObjectId.TryParse(search, out _))
+        matches.Add(filters.Eq(r => r.Id, search));
+
+    var filter =
+        filters.Eq(r => r.Status, ReservationStatus.Approved)
+        & filters.Type("qrCode.code", BsonType.String)
+        & filters.Ne("qrCode.code", "")
+        & filters.Or(matches);
+
+    return await _reservations
+        .Find(filter)
+        .SortBy(r => r.ScheduledDateTime)
+        .Limit(20)
+        .ToListAsync();
+}
     }
 }
