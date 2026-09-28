@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- [Member 3] Booking Summary after create / update / cancel -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_dark"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:id="@+id/tvSummaryIcon"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="28dp"
+            android:background="@drawable/bg_circle_ok"
+            android:gravity="center"
+            android:text="✓"
+            android:textColor="@color/res_teal"
+            android:textSize="26sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvSummaryTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="14dp"
+            android:textColor="@color/text_primary"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvSummaryText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="6dp"
+            android:gravity="center"
+            android:maxWidth="300dp"
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/bg_card"
+            android:orientation="vertical"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp">
+
+            <LinearLayout style="@style/SummaryRow">
+                <TextView style="@style/SummaryKey" android:text="Reservation" />
+                <TextView android:id="@+id/tvSumId" style="@style/SummaryValue" android:fontFamily="monospace" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SummaryRow">
+                <TextView style="@style/SummaryKey" android:text="Node" />
+                <TextView android:id="@+id/tvSumNode" style="@style/SummaryValue" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SummaryRow">
+                <TextView style="@style/SummaryKey" android:text="Scheduled" />
+                <TextView android:id="@+id/tvSumTime" style="@style/SummaryValue" android:fontFamily="monospace" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SummaryRow">
+                <TextView style="@style/SummaryKey" android:text="Type" />
+                <TextView android:id="@+id/tvSumType" style="@style/SummaryValue" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SummaryRow">
+                <TextView style="@style/SummaryKey" android:text="Status" />
+                <TextView
+                    android:id="@+id/tvSumStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_badge_pending"
+                    android:fontFamily="monospace"
+                    android:paddingStart="8dp"
+                    android:paddingTop="3dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="3dp"
+                    android:textSize="11sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnBackDashboard"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="@color/solara_yellow"
+            android:text="Back to dashboard"
+            android:textAllCaps="false"
+            android:textColor="@color/btn_text"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnViewBookings"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_marginTop="8dp"
+            android:text="View my bookings"
+            android:textAllCaps="false"
+            android:textColor="@color/text_primary"
+            app:strokeColor="@color/stroke_input" />
+    </LinearLayout>
+</ScrollView>
