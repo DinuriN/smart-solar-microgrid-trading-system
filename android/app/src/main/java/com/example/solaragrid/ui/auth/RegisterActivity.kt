@@ -65,7 +65,7 @@ class RegisterActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<ApiResponse<Any>>, t: Throwable) {
-                    Toast.makeText(this@RegisterActivity, "Network Error: ${t.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@RegisterActivity, t.message ?: "An unknown error occurred", Toast.LENGTH_LONG).show()
                 }
             })
         }

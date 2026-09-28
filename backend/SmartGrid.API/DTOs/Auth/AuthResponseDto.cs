@@ -1,7 +1,7 @@
 /*
  * File Name    : AuthResponseDto.cs
  * Description  : What the API sends back after a successful login.
- * Author       : E G S U Kantha
+* Author       : E G S U Kantha
  * IT Number    : IT23231832
  * Date         : 2026-09-18
  */

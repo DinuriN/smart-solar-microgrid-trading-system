@@ -1,7 +1,7 @@
 /*
  * File Name    : Prosumer.cs
  * Description  : Prosumer class that inherits from User.
- * Author       : E G S U Kantha
+* Author       : E G S U Kantha
  * IT Number    : IT23231832
  * Date         : 2026-09-18
  */

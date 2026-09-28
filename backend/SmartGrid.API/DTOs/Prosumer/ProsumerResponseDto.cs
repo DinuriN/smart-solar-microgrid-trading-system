@@ -1,8 +1,8 @@
 /*
  * File Name    : ProsumerResponseDto.cs
  * Description  : Used when the API sends Prosumer data back to React/Android.
- * Author       : [Student Name]
- * IT Number    : [Student IT Number]
+ * Author       : E G S U Kantha
+ * IT Number    : IT23231832
  * Date         : 2026-09-18
  */
 
