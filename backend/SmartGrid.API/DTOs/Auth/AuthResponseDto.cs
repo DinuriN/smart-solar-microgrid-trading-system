@@ -1,8 +1,8 @@
 /*
  * File Name    : AuthResponseDto.cs
  * Description  : What the API sends back after a successful login.
- * Author       : [Student Name]
- * IT Number    : [Student IT Number]
+* Author       : E G S U Kantha
+ * IT Number    : IT23231832
  * Date         : 2026-09-18
  */
 
