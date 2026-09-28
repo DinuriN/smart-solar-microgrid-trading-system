@@ -9,6 +9,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import android.content.Intent
 import com.example.solaragrid.ui.operator.GridOperatorScanActivity
 import com.example.solaragrid.ui.prosumer.ProsumerQrFragment
+import com.example.solaragrid.ui.reservation.MyBookingsFragment
 import com.example.solaragrid.ui.reservation.ProsumerHomeFragment
 
 class DashboardActivity : AppCompatActivity() {
@@ -62,7 +63,7 @@ class DashboardActivity : AppCompatActivity() {
                 when (item.itemId) {
                     R.id.nav_home -> loadFragment(ProsumerHomeFragment())         // [Member 3]
                     R.id.nav_map -> loadFragment(ComingSoonFragment.newInstance("Map"))
-                    R.id.nav_bookings -> loadFragment(ComingSoonFragment.newInstance("Bookings"))
+                    R.id.nav_bookings -> loadFragment(MyBookingsFragment())       // [Member 3]
                     R.id.nav_profile -> loadFragment(ProsumerProfileFragment())
                     R.id.nav_qr -> loadFragment(ProsumerQrFragment())
                 }
@@ -90,7 +91,7 @@ class DashboardActivity : AppCompatActivity() {
         val nav = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         val target = if (tab == "bookings") R.id.nav_bookings else R.id.nav_home
         if (nav.selectedItemId == target) {
-            loadFragment(if (tab == "bookings") ComingSoonFragment.newInstance("Bookings") else ProsumerHomeFragment())
+            loadFragment(if (tab == "bookings") MyBookingsFragment() else ProsumerHomeFragment())
         } else {
             nav.selectedItemId = target
         }
