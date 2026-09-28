@@ -109,6 +109,12 @@ namespace SmartGrid.API.Controllers
             if (reservation.Status != ReservationStatus.Pending)
                 return Conflict(new { message = "Only pending reservations can be approved." });
 
+            if (reservation.ScheduledDateTime <= DateTime.UtcNow)
+                return Conflict(new { message = "This reservation's scheduled time has passed. Create a new reservation for a future time." });
+
+            if (reservation.QrCode != null)
+                return Conflict(new { message = "This reservation already has a QR code. Refresh the list." });
+            
             var approved = await _gridOperationsService.ApprovePendingReservationAsync(id);
 
             if (!approved)
@@ -116,5 +122,26 @@ namespace SmartGrid.API.Controllers
 
             return Ok(new { success = true, reservationId = id, status = "Approved" });
         }
+
+        [HttpGet("approved-for-qr")]
+[Authorize(Roles = "GridOperator")]
+public async Task<IActionResult> FindApprovedForQr(
+    [FromQuery] string criteria)
+{
+    var reservations =
+        await _gridOperationsService.FindApprovedQrReservationsAsync(criteria);
+
+    return Ok(reservations.Select(r => new
+    {
+        id = r.Id,
+        prosumerNic = r.ProsumerNic,
+        nodeId = r.NodeId,
+        batterySlotId = r.BatterySlotId,
+        type = r.Type.ToString(),
+        scheduledDateTime = r.ScheduledDateTime,
+        status = r.Status.ToString(),
+        qrCode = r.QrCode!.Code
+    }));
+}
     }
 }

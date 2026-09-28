@@ -1,8 +1,6 @@
 /*
  * File Name    : Program.cs
  * Description  : The entry point of the ASP.NET Core application, configuring services and the HTTP request pipeline.
- * Author       : [Student Name]
- * IT Number    : [Student IT Number]
  * Date         : 2026-09-18
  */
 
@@ -21,7 +19,7 @@ builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         // Enums will be serialized as Strings instead of Integers, 
-        // so the Thin Client doesn't have to map them!
+        // so the Thin Client doesn't have to map them
         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
     });
 
@@ -52,7 +50,7 @@ builder.Services.AddSwaggerGen(
 
     c =>
 {
-    // Add the "Authorize" button to Swagger UI
+    // Add the Authorize button to Swagger UI
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         Description = "Paste your JWT token here (you don't need to type 'Bearer' anymore!).",
