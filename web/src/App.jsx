@@ -12,6 +12,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import Dashboard from './pages/admin/Dashboard';
 import { PageHeaderProvider } from './context/PageHeaderContext';
 import OperatorDashboard from './pages/admin/OperatorDashboard';
+import Home from './pages/Home';
 
 
 function App() {
@@ -20,11 +21,13 @@ function App() {
       <PageHeaderProvider>
         <Routes>
 
+          <Route path="/" element={<Home />} />
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
 
           {/* Default route redirect to login */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          {/* <Route path="/" element={<Navigate to="/login" replace />} /> */}
+          
 
           {/* Protected Routes Wrapper - Thin Client (Only checks if logged in) */}
           <Route element={<ProtectedRoute />}>

@@ -92,7 +92,7 @@ class LoginActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<ApiResponse<AuthResponseDto>>, t: Throwable) {
-                    Toast.makeText(this@LoginActivity, "Network Error: ${t.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@LoginActivity, t.message ?: "An unknown error occurred", Toast.LENGTH_LONG).show()
                 }
             })
         }
