@@ -22,7 +22,16 @@ export default function Login() {
       // Call the C# Backend
       const data = await authService.login(emailOrNic, password);
 
-      // If success, save the JWT token
+      // FAT Backend / Thin Client Security Enforcement:
+      // The backend successfully authenticated the user, but this Thin Client (Web Portal) 
+      // is only for BackOffice and Grid Operators. 
+      if (data.role === "Prosumer") {
+        setErrorMsg("Access Denied: Prosumers must use the Solara Grid Mobile App.");
+        setIsLoading(false);
+        return; // Stop the login process
+      }
+
+      // If success and allowed, save the JWT token
       localStorage.setItem("token", data.token);
 
       localStorage.setItem("userRole", data.role);
