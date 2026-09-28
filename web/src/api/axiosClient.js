@@ -37,7 +37,17 @@ axiosClient.interceptors.response.use(
       return Promise.reject(error);
     }
 
-
+    // Global DataAnnotation Validation Error Extractor
+    // Intercepts 400 Bad Request from C# and formats the `.errors` dictionary into a readable string
+    if (error.response && error.response.status === 400 && error.response.data && error.response.data.errors) {
+      const validationErrors = error.response.data.errors;
+      const errorMessages = Object.values(validationErrors)
+        .flat()
+        .join(' | '); // Join all validation messages with a pipe
+      
+      // Inject the extracted message back into the error object so our JSX files can read it easily
+      error.response.data.message = errorMessages;
+    }
 
     // If the FAT Backend rejects the request due to missing/expired token or invalid role
     if (error.response && (error.response.status === 401 || error.response.status === 403)) {
