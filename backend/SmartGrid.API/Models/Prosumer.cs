@@ -1,8 +1,8 @@
 /*
  * File Name    : Prosumer.cs
  * Description  : Prosumer class that inherits from User.
- * Author       : [Student Name]
- * IT Number    : [Student IT Number]
+ * Author       : E G S U Kantha
+ * IT Number    : IT23231832
  * Date         : 2026-09-18
  */
 

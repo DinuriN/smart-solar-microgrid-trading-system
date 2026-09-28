@@ -1,8 +1,8 @@
 /*
  * File Name    : CreateWebUserDto.cs
  * Description  : Used when a BackOffice user creates a GridOperator or another BackOffice user.
- * Author       : [Student Name]
- * IT Number    : [Student IT Number]
+ * Author       : E G S U Kantha
+ * IT Number    : IT23231832
  * Date         : 2026-09-18
  */
 
