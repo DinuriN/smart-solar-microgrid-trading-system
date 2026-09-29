@@ -19,6 +19,8 @@ import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import android.content.Intent
+import com.example.solaragrid.ui.operator.GridOperatorScanActivity
 
 class LoginActivity : AppCompatActivity() {
 
@@ -90,7 +92,7 @@ class LoginActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<ApiResponse<AuthResponseDto>>, t: Throwable) {
-                    Toast.makeText(this@LoginActivity, "Network Error: ${t.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@LoginActivity, t.message ?: "An unknown error occurred", Toast.LENGTH_LONG).show()
                 }
             })
         }

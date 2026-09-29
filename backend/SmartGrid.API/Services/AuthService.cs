@@ -1,8 +1,8 @@
 /*
  * File Name    : AuthService.cs
  * Description  : Contains logic for Authentication and JWT Generation.
- * Author       : [Student Name]
- * IT Number    : [Student IT Number]
+ * Author       : E G S U Kantha
+ * IT Number    : IT23231832
  * Date         : 2026-09-18
  */
 
@@ -59,6 +59,7 @@ namespace SmartGrid.API.Services
                 menu.Add(new MenuItemDto { Label = "Dashboard", Path = "/operator/dashboard", Icon = "dashboard" });
                 menu.Add(new MenuItemDto { Label = "Microgrid Nodes", Path = "/operator/nodes", Icon = "nodes" });
                 menu.Add(new MenuItemDto { Label = "Reservations", Path = "/operator/reservations", Icon = "reservations" });
+                menu.Add(new MenuItemDto { Label = "Verify QR & Finalize", Path = "/operator/qr", Icon = "reservations" });
             }
            
 
