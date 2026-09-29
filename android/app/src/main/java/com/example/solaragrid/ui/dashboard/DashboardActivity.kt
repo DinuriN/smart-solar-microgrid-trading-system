@@ -59,7 +59,7 @@ class DashboardActivity : AppCompatActivity() {
             bottomNav.setOnItemSelectedListener { item ->
                 when (item.itemId) {
                     R.id.nav_home -> loadFragment(ComingSoonFragment.newInstance("Home"))
-                    R.id.nav_map -> loadFragment(ComingSoonFragment.newInstance("Map"))
+                    R.id.nav_map -> loadFragment(MapFragment())
                     R.id.nav_bookings -> loadFragment(ComingSoonFragment.newInstance("Bookings"))
                     R.id.nav_profile -> loadFragment(ProsumerProfileFragment())
                     R.id.nav_qr -> loadFragment(ProsumerQrFragment())

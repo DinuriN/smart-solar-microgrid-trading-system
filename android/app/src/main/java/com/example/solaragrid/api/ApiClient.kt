@@ -11,7 +11,7 @@ import java.io.IOException
 // creates a singleton Retrofit instance.
 object ApiClient {
     // We now read the Base URL dynamically from local.properties -> BuildConfig
-    private const val BASE_URL = com.example.solaragrid.BuildConfig.API_BASE_URL
+    private val BASE_URL = com.example.solaragrid.BuildConfig.API_BASE_URL
 
     private var retrofit: Retrofit? = null
 
