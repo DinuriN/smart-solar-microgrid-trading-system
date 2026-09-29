@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- [Member 3] Extra colours for the reservation screens (matches the mobile prototype) -->
+<resources>
+    <color name="res_teal">#2FD9C4</color>
+    <color name="res_pink">#F57A98</color>
+    <color name="res_gray">#A3AEC5</color>
+    <color name="res_danger">#E0456C</color>
+    <color name="res_badge_teal">#242FD9C4</color>
+    <color name="res_badge_yellow">#24FFB822</color>
+    <color name="res_badge_pink">#24F57A98</color>
+    <color name="res_badge_gray">#24A3AEC5</color>
+    <color name="res_note_bg">#14FFB822</color>
+    <color name="res_note_stroke">#4DFFB822</color>
+    <color name="res_error_bg">#1AF0567D</color>
+    <color name="res_error_stroke">#66F0567D</color>
+</resources>

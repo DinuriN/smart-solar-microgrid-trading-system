@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { prosumerService } from '../../api/prosumerService';
+import { usePageHeader } from '../../context/PageHeaderContext';
 
 export default function ProsumersList() {
+  const { setHeader } = usePageHeader();
   const [prosumers, setProsumers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -18,6 +20,10 @@ export default function ProsumersList() {
 
 
   useEffect(() => {
+    setHeader({
+      title: "Prosumers Directory",
+      breadcrumb: "solara-grid / administration / prosumers"
+    });
     fetchProsumers();
   }, []);
 
@@ -144,12 +150,20 @@ export default function ProsumersList() {
                       Edit
                     </button>
                     {p.deactivationRequested && p.isActive && (
-                      <button
-                        onClick={() => handleStatusToggle(p.nic, 'deactivate')}
-                        className="px-2 py-1 border border-red-500/30 text-red-400 rounded text-[10px] hover:bg-red-500/10"
-                      >
-                        Deactivate
-                      </button>
+                      <>
+                        <button
+                          onClick={() => handleStatusToggle(p.nic, 'reactivate')}
+                          className="px-2 py-1 border border-slate-500/30 text-slate-400 rounded text-[10px] hover:bg-slate-500/10"
+                        >
+                          Reject
+                        </button>
+                        <button
+                          onClick={() => handleStatusToggle(p.nic, 'deactivate')}
+                          className="px-2 py-1 border border-red-500/30 text-red-400 rounded text-[10px] hover:bg-red-500/10"
+                        >
+                          Deactivate
+                        </button>
+                      </>
                     )}
                     {!p.isActive && (
                       <button

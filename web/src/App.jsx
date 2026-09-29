@@ -11,6 +11,8 @@ import ReservationsList from "./pages/admin/ReservationsList";
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Dashboard from './pages/admin/Dashboard';
 import { PageHeaderProvider } from './context/PageHeaderContext';
+import OperatorDashboard from './pages/admin/OperatorDashboard';
+import Home from './pages/Home';
 
 
 function App() {
@@ -19,11 +21,13 @@ function App() {
       <PageHeaderProvider>
         <Routes>
 
+          <Route path="/" element={<Home />} />
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
 
           {/* Default route redirect to login */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          {/* <Route path="/" element={<Navigate to="/login" replace />} /> */}
+          
 
           {/* Protected Routes Wrapper - Thin Client (Only checks if logged in) */}
           <Route element={<ProtectedRoute />}>
@@ -34,10 +38,19 @@ function App() {
               <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="welcome" element={<Welcome />} />
               <Route path="prosumers" element={<ProsumersList />} />
-            <Route path="nodes" element={<NodesList />} />
+              <Route path="nodes" element={<NodesList />} />
               <Route path="users" element={<WebUsersList />} />
               <Route path="reservations" element={<ReservationsList />} />
               <Route path="dashboard" element={<Dashboard />} />
+                
+            </Route>
+
+            {/* Operator Dashboard Layout */}
+            <Route path="/operator" element={<DashboardLayout />}>
+              <Route index element={<Navigate to="dashboard" replace />} />
+              <Route path="dashboard" element={<OperatorDashboard />} />
+              <Route path="nodes" element={<NodesList />} />
+              <Route path="reservations" element={<ReservationsList />} />
             </Route>
 
           </Route>
