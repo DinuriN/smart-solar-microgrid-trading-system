@@ -6,7 +6,7 @@
  * IT Number    : IT23453142
  * Date         : 2026-09-21
  */
-
+ 
 namespace SmartGrid.API.Services
 {
     public class NodeGateway : INodeGateway

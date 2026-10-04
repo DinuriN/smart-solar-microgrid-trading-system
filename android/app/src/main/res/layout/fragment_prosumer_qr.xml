@@ -9,85 +9,75 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="20dp">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="My transaction QR"
+            android:layout_marginTop="20dp"
+            android:text="My bookings"
             android:textColor="@color/text_primary"
             android:textSize="24sp"
             android:textStyle="bold" />
 
-        <TextView
+        <EditText
+            android:id="@+id/etBookingSearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="Search bookings..."
+            android:inputType="text"
+            android:singleLine="true"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnCurrentBookings"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Current" />
+
+            <Button
+                android:id="@+id/btnBookingHistory"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="History" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnPreviewSampleBooking"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Select an approved reservation to show its QR code to the Grid Operator."
-            android:textColor="@color/text_secondary" />
-
+            android:text="Preview sample booking" />
+        
         <Button
             android:id="@+id/btnRefreshQr"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Refresh reservations" />
+            android:layout_marginTop="8dp"
+            android:text="Refresh bookings" />
 
         <TextView
-            android:id="@+id/tvQrStatus"
+            android:id="@+id/tvBookingsStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Loading reservations..."
+            android:layout_marginTop="14dp"
             android:textColor="@color/text_secondary" />
 
         <LinearLayout
-            android:id="@+id/qrBookingList"
+            android:id="@+id/bookingList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="16dp"
             android:orientation="vertical" />
-
-        <LinearLayout
-            android:id="@+id/qrDisplay"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:background="@color/bg_input"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:visibility="gone">
-
-            <TextView
-                android:id="@+id/tvQrReservation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/text_primary"
-                android:textStyle="bold" />
-
-            <ImageView
-                android:id="@+id/ivReservationQr"
-                android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:layout_marginTop="12dp"
-                android:background="@android:color/white"
-                android:contentDescription="Approved reservation QR code"
-                android:padding="8dp"
-                android:scaleType="fitCenter" />
-
-            <Button
-                android:id="@+id/btnCopyQrCode"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="Copy QR code for emulator test" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="The operator scans this code and confirms the transfer."
-                android:textColor="@color/text_secondary" />
-        </LinearLayout>
     </LinearLayout>
 </ScrollView>

@@ -59,6 +59,7 @@ namespace SmartGrid.API.Services
                 menu.Add(new MenuItemDto { Label = "Dashboard", Path = "/operator/dashboard", Icon = "dashboard" });
                 menu.Add(new MenuItemDto { Label = "Microgrid Nodes", Path = "/operator/nodes", Icon = "nodes" });
                 menu.Add(new MenuItemDto { Label = "Reservations", Path = "/operator/reservations", Icon = "reservations" });
+                menu.Add(new MenuItemDto { Label = "Verify QR & Finalize", Path = "/operator/qr", Icon = "reservations" });
             }
            
 

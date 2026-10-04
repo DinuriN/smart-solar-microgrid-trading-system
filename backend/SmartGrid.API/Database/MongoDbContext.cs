@@ -1,8 +1,6 @@
 /*
  * File Name    : MongoDbContext.cs
- * Description  : Handles the connection to the MongoDB database and exposes collections.
- * Author       : [Student Name]
- * IT Number    : [Student IT Number]
+ * Description  : Handles the connection to the MongoDB database and exposes collections
  * Date         : 2026-09-18
  */
 
