@@ -41,8 +41,8 @@ export const updateReservation = (id, payload) =>
 export const cancelReservation = (id) =>
   axiosClient.delete(`${BASE}/${id}`);
 
-// Fetch available battery slots for a given node
-export const getAvailableSlots = (nodeId, scheduledDateTime) =>
-  axiosClient.get(`/nodes/${nodeId}/battery-slots`, {
-    params: scheduledDateTime ? { scheduledDateTime } : {},
+// Fetch the battery slots that are free on a node at the chosen time
+export const getAvailableSlots = (nodeId, arrivalTime) =>
+  axiosClient.get(`/nodes/${nodeId}/battery-slots/available`, {
+    params: { arrivalTime },
   });

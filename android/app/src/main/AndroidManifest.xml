@@ -34,24 +34,35 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
+
         <activity
             android:name=".ui.auth.LoginActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
-            
+
         <activity
             android:name=".ui.auth.RegisterActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
-            
+
         <activity
             android:name=".ui.dashboard.DashboardActivity"
             android:exported="false"
+            android:launchMode="singleTop"
             android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".ui.operator.GridOperatorScanActivity"
+            android:exported="false" />
+
+        <!-- [Member 3] Reservation screens -->
+        <activity
+            android:name=".ui.reservation.ReservationFormActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ui.reservation.BookingSummaryActivity"
             android:exported="false" />
     </application>
 
