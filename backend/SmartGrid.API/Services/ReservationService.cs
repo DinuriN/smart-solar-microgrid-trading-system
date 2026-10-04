@@ -150,7 +150,7 @@ namespace SmartGrid.API.Services
         // ---------- PROSUMER READS ----------
         public async Task<List<ReservationResponseDto>> GetHistoryAsync(string nic)
         {
-            // Full booking history for one prosumer (newest first)
+            // Full booking history for one prosumer, newest first
             var results = await _db.Reservations
                 .Find(r => r.ProsumerNic == nic)
                 .SortByDescending(r => r.ScheduledDateTime)
@@ -172,6 +172,20 @@ namespace SmartGrid.API.Services
                 ActiveCount = (int)active,
                 PendingCount = (int)pending
             };
+        }
+
+        public async Task<List<ReservationResponseDto>> GetUpcomingAsync(string nic, int limit = 3)
+        {
+            // Next few Pending or Approved bookings for one prosumer, soonest first
+            var results = await _db.Reservations
+                .Find(r => r.ProsumerNic == nic
+                    && (r.Status == ReservationStatus.Pending || r.Status == ReservationStatus.Approved)
+                    && r.ScheduledDateTime >= DateTime.UtcNow)
+                .SortBy(r => r.ScheduledDateTime)
+                .Limit(limit)
+                .ToListAsync();
+
+            return results.Select(MapToDto).ToList();
         }
 
         // ---------- GRID OPERATOR READS ----------
@@ -261,12 +275,33 @@ namespace SmartGrid.API.Services
                 scopeFilter = filterBuilder.Empty; // BackOffice: unscoped
             }
 
-            var pattern = Regex.Escape(criteria ?? string.Empty);
-            var textFilter = filterBuilder.Or(
+            var text = (criteria ?? string.Empty).Trim();
+            var pattern = Regex.Escape(text);
+            var textFilters = new List<FilterDefinition<EnergyReservation>>
+            {
                 filterBuilder.Regex(r => r.ProsumerNic, new MongoDB.Bson.BsonRegularExpression(pattern, "i")),
                 filterBuilder.Regex(r => r.NodeId, new MongoDB.Bson.BsonRegularExpression(pattern, "i")),
                 filterBuilder.Regex(r => r.BatterySlotId, new MongoDB.Bson.BsonRegularExpression(pattern, "i"))
-            );
+            };
+
+            // Also match by node name: ask the node component which nodes have this text in their name
+            var namedNodeIds = await _nodeGateway.FindNodeIdsByNameAsync(text);
+            if (namedNodeIds.Count > 0)
+                textFilters.Add(filterBuilder.In(r => r.NodeId, namedNodeIds));
+
+            // Also match by reservation ID (full ID or part of it, e.g. the short code shown in the app)
+            if (Regex.IsMatch(text, "^[0-9a-fA-F]{4,24}$"))
+            {
+                var scopedIds = await _db.Reservations.Find(scopeFilter).Project(r => r.Id).ToListAsync();
+                var idMatches = scopedIds
+                    .Where(id => id.Contains(text, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
+                if (idMatches.Count > 0)
+                    textFilters.Add(filterBuilder.In(r => r.Id, idMatches));
+            }
+
+            var textFilter = filterBuilder.Or(textFilters);
 
             var finalFilter = scopeFilter & textFilter;
 
