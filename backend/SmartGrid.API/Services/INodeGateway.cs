@@ -15,5 +15,6 @@ namespace SmartGrid.API.Services
         Task<bool> SetSlotBookedAsync(string nodeId, string slotId, bool booked);
         Task<List<string>> GetOperatorNodeIdsAsync(string operatorId);
         Task<List<string>> GetAvailableSlotsAsync(string nodeId);
+        Task<List<string>> FindNodeIdsByNameAsync(string text);
     }
 }

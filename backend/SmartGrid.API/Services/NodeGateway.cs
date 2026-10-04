@@ -6,7 +6,7 @@
  * IT Number    : IT23453142
  * Date         : 2026-09-21
  */
- 
+
 namespace SmartGrid.API.Services
 {
     public class NodeGateway : INodeGateway
@@ -26,7 +26,8 @@ namespace SmartGrid.API.Services
             return free.Any(s => s.Id == slotId);
         }
 
-        // Checks that the time falls inside the slot's window, whatever the slot's status (used when a reservation keeps its own, already booked, slot and only the time changes)
+        // Checks that the time falls inside the slot's window, whatever the slot's status
+        // (used when a reservation keeps its own, already booked, slot and only the time changes)
         public async Task<bool> SlotCoversTimeAsync(string nodeId, string slotId, DateTime time)
         {
             var slot = await _nodeService.GetSlotAsync(nodeId, slotId);
@@ -40,7 +41,8 @@ namespace SmartGrid.API.Services
             return await _nodeService.UpdateSlotStatusAsync(nodeId, slotId, status);
         }
 
-        // Gets the nodes a grid operator works with. (Operators are not tied to one node for now)
+        // Gets the nodes a grid operator works with.
+        // Operators are not tied to one node, so this is every active node.
         public async Task<List<string>> GetOperatorNodeIdsAsync(string operatorId)
         {
             var nodes = await _nodeService.GetAllActiveNodesAsync();
@@ -54,6 +56,19 @@ namespace SmartGrid.API.Services
             return slots
                 .Where(s => s.Status == "Available")
                 .Select(s => s.Id)
+                .ToList();
+        }
+
+        // Finds the IDs of active nodes whose name contains the given text (used by the reservation search)
+        public async Task<List<string>> FindNodeIdsByNameAsync(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return new List<string>();
+
+            var nodes = await _nodeService.GetAllActiveNodesAsync();
+            return nodes
+                .Where(n => n.NodeName.Contains(text, StringComparison.OrdinalIgnoreCase))
+                .Select(n => n.Id)
                 .ToList();
         }
     }

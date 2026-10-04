@@ -1,7 +1,8 @@
 /*
  * File Name    : MyBookingsFragment.kt
- * Description  : My Bookings - Current / Pending / History tabs, a search box, and
- *                Modify / Cancel actions on Current and Pending bookings.
+ * Description  : My Bookings - Current / Pending / History tabs, a search box (the
+ *                search runs on the server), and Modify / Cancel actions on Current
+ *                and Pending bookings.
  * Author       : Kandaudahewa C I
  * IT Number    : IT23453142
  * Date         : 2026-09-28
@@ -9,6 +10,8 @@
 package com.example.solaragrid.ui.reservation
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,7 +37,9 @@ class MyBookingsFragment : Fragment() {
 
     private var all: List<ReservationDto> = emptyList()
     private var currentTab = BookingTab.CURRENT
-    private var historyCall: Call<List<ReservationDto>>? = null
+    private var listCall: Call<List<ReservationDto>>? = null
+    private val searchHandler = Handler(Looper.getMainLooper())
+    private var searchRunnable: Runnable? = null
     private lateinit var adapter: BookingAdapter
 
     // Inflates the My Bookings layout
@@ -65,7 +70,8 @@ class MyBookingsFragment : Fragment() {
                 override fun onTabReselected(tab: TabLayout.Tab) {}
             })
 
-        view.findViewById<EditText>(R.id.etSearchBookings).doAfterTextChanged { render() }
+        // Typing sends the text to the server search (after a short pause)
+        view.findViewById<EditText>(R.id.etSearchBookings).doAfterTextChanged { scheduleSearch() }
     }
 
     // Reloads whenever the tab is shown again (e.g. after modify / cancel)
@@ -74,7 +80,15 @@ class MyBookingsFragment : Fragment() {
         loadBookings()
     }
 
-    // GET /api/reservations/history/{nic}
+    // Waits until typing stops, then asks the server again
+    private fun scheduleSearch() {
+        searchRunnable?.let { searchHandler.removeCallbacks(it) }
+        val task = Runnable { fetchBookings() }
+        searchRunnable = task
+        searchHandler.postDelayed(task, 400)
+    }
+
+    // Refreshes the node names, then loads the bookings
     private fun loadBookings() {
         val root = view ?: return
         val status = root.findViewById<TextView>(R.id.tvBookingsStatus)
@@ -89,40 +103,54 @@ class MyBookingsFragment : Fragment() {
 
         NodeDirectory.refresh(requireContext()) {
             if (!isAdded || view !== root) return@refresh
-            historyCall?.cancel()
-            val call = ApiClient.getClient(requireContext().applicationContext)
-                .create(ReservationApi::class.java).getHistory(nic)
-            historyCall = call
-            call.enqueue(object : Callback<List<ReservationDto>> {
-                override fun onResponse(c: Call<List<ReservationDto>>, r: Response<List<ReservationDto>>) {
-                    if (!isAdded || view !== root) return
-                    if (!r.isSuccessful) {
-                        status.text = "Could not load bookings (HTTP ${r.code()})."
-                        return
-                    }
-                    all = r.body().orEmpty()
-                    render()
-                }
-
-                override fun onFailure(c: Call<List<ReservationDto>>, t: Throwable) {
-                    if (!isAdded || view !== root || c.isCanceled) return
-                    status.text = "Could not reach the server."
-                }
-            })
+            fetchBookings()
         }
     }
 
-    // Shows the bookings of the selected tab that match the search text
+    // Empty search box: GET /api/reservations/history/{nic}
+    // Text typed:       GET /api/reservations/search?criteria=... (the server does the matching)
+    private fun fetchBookings() {
+        val root = view ?: return
+        val status = root.findViewById<TextView>(R.id.tvBookingsStatus)
+        val nic = UserManager(requireContext()).getLoggedInUser()?.nic
+        if (nic.isNullOrBlank()) return
+        val query = searchText()
+
+        listCall?.cancel()
+        val api = ApiClient.getClient(requireContext().applicationContext)
+            .create(ReservationApi::class.java)
+        val call = if (query.isEmpty()) api.getHistory(nic) else api.search(query)
+        listCall = call
+        call.enqueue(object : Callback<List<ReservationDto>> {
+            override fun onResponse(c: Call<List<ReservationDto>>, r: Response<List<ReservationDto>>) {
+                if (!isAdded || view !== root || c.isCanceled) return
+                if (!r.isSuccessful) {
+                    status.text = "Could not load bookings (HTTP ${r.code()})."
+                    status.visibility = View.VISIBLE
+                    return
+                }
+                all = r.body().orEmpty()
+                render()
+            }
+
+            override fun onFailure(c: Call<List<ReservationDto>>, t: Throwable) {
+                if (!isAdded || view !== root || c.isCanceled) return
+                status.text = "Could not reach the server."
+                status.visibility = View.VISIBLE
+            }
+        })
+    }
+
+    // Text currently typed in the search box
+    private fun searchText(): String =
+        view?.findViewById<EditText>(R.id.etSearchBookings)?.text?.toString()?.trim().orEmpty()
+
+    // Shows the server's results for the selected tab
     private fun render() {
         val root = view ?: return
-        val query = root.findViewById<EditText>(R.id.etSearchBookings).text.toString().trim().lowercase()
+        val query = searchText()
         val list = all
             .filter { it.tab() == currentTab }
-            .filter {
-                query.isEmpty() ||
-                    it.id.lowercase().contains(query) ||
-                    NodeDirectory.nameFor(requireContext(), it.nodeId).lowercase().contains(query)
-            }
             .sortedBy { ReservationTime.parse(it.scheduledDateTime)?.time ?: 0L }
             .let { if (currentTab == BookingTab.HISTORY) it.reversed() else it }
 
@@ -159,7 +187,11 @@ class MyBookingsFragment : Fragment() {
                             )
                         )
                     } else {
-                        Toast.makeText(ctx, apiErrorMessage(response, "Could not cancel this reservation."), Toast.LENGTH_LONG).show()
+                        // e.g. the server's 12-hour rule message
+                        showServerMessage(
+                            ctx, "Reservation not cancelled",
+                            apiErrorMessage(response, "Could not cancel this reservation.")
+                        )
                     }
                 }
 
@@ -172,7 +204,8 @@ class MyBookingsFragment : Fragment() {
 
     // Cancels the running request when the view goes away
     override fun onDestroyView() {
-        historyCall?.cancel()
+        searchRunnable?.let { searchHandler.removeCallbacks(it) }
+        listCall?.cancel()
         super.onDestroyView()
     }
 }
