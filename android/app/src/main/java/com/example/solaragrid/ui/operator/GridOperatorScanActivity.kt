@@ -42,7 +42,9 @@ class GridOperatorScanActivity : AppCompatActivity() {
     private lateinit var detailsCard: LinearLayout
     private lateinit var detailsContainer: LinearLayout
     private lateinit var finalizeButton: Button
+    private lateinit var finalizeHint: TextView
 
+    private var reservationStatusText: TextView? = null
     private var verifiedReservationId: String? = null
 
     private fun dp(value: Int): Int =
@@ -81,7 +83,6 @@ class GridOperatorScanActivity : AppCompatActivity() {
             setPadding(0, dp(8), 0, dp(24))
         })
 
-        // Scan section
         val scanCard = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(18), dp(18), dp(18), dp(18))
@@ -119,7 +120,6 @@ class GridOperatorScanActivity : AppCompatActivity() {
             )
         )
 
-        // Keep manual entry available for emulator testing.
         val manualEntry = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             visibility = View.GONE
@@ -128,7 +128,7 @@ class GridOperatorScanActivity : AppCompatActivity() {
         val qrInput = EditText(this).apply {
             hint = "Paste QR code"
             inputType = InputType.TYPE_CLASS_TEXT or
-                    InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+                InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
             setSingleLine(true)
             textSize = 13f
             setTextColor(appColor(R.color.text_primary))
@@ -146,6 +146,7 @@ class GridOperatorScanActivity : AppCompatActivity() {
 
             setOnClickListener {
                 val code = qrInput.text.toString().trim()
+
                 if (code.isBlank()) {
                     setStatus(
                         "Code needed",
@@ -163,6 +164,7 @@ class GridOperatorScanActivity : AppCompatActivity() {
             textSize = 13f
             setTextColor(appColor(R.color.solara_yellow))
             setPadding(0, dp(16), 0, dp(5))
+
             setOnClickListener {
                 manualEntry.visibility =
                     if (manualEntry.visibility == View.VISIBLE) {
@@ -183,7 +185,6 @@ class GridOperatorScanActivity : AppCompatActivity() {
             )
         )
 
-        // Verification feedback
         val statusCard = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(18), dp(17), dp(18), dp(17))
@@ -214,7 +215,6 @@ class GridOperatorScanActivity : AppCompatActivity() {
             ).apply { topMargin = dp(16) }
         )
 
-        // Reservation details appear after verification.
         detailsCard = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(18), dp(18), dp(18), dp(18))
@@ -254,12 +254,13 @@ class GridOperatorScanActivity : AppCompatActivity() {
             ).apply { topMargin = dp(18) }
         )
 
-        detailsCard.addView(TextView(this).apply {
+        finalizeHint = TextView(this).apply {
             text = "Finalize only after the physical energy transfer is complete."
             textSize = 12f
             setTextColor(appColor(R.color.text_secondary))
             setPadding(0, dp(8), 0, 0)
-        })
+        }
+        detailsCard.addView(finalizeHint)
 
         page.addView(
             detailsCard,
@@ -269,7 +270,6 @@ class GridOperatorScanActivity : AppCompatActivity() {
             ).apply { topMargin = dp(16) }
         )
 
-        // No fillViewport property is needed here.
         val scrollView = ScrollView(this).apply {
             setBackgroundColor(appColor(R.color.bg_dark))
             addView(page)
@@ -284,7 +284,7 @@ class GridOperatorScanActivity : AppCompatActivity() {
         statusText.text = message
     }
 
-    private fun addDetail(label: String, value: String?) {
+    private fun addDetail(label: String, value: String?): TextView {
         val row = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(0, dp(9), 0, dp(9))
@@ -296,15 +296,18 @@ class GridOperatorScanActivity : AppCompatActivity() {
             setTextColor(appColor(R.color.text_secondary))
         })
 
-        row.addView(TextView(this).apply {
+        val valueText = TextView(this).apply {
             text = value?.takeIf { it.isNotBlank() } ?: "—"
             textSize = 14f
             setTextColor(appColor(R.color.text_primary))
             setTextIsSelectable(true)
             setPadding(0, dp(3), 0, 0)
-        })
+        }
 
+        row.addView(valueText)
         detailsContainer.addView(row)
+
+        return valueText
     }
 
     private fun showReservation(result: VerifyQrResponse) {
@@ -315,6 +318,7 @@ class GridOperatorScanActivity : AppCompatActivity() {
         addDetail("Node ID", result.nodeId)
         addDetail("Battery slot ID", result.batterySlotId)
         addDetail("Transfer type", result.type)
+
         addDetail(
             "Scheduled time",
             result.scheduledDateTime
@@ -322,11 +326,19 @@ class GridOperatorScanActivity : AppCompatActivity() {
                 ?.removeSuffix("Z")
                 ?.plus(" UTC")
         )
-        addDetail("Reservation status", result.status)
+
+        reservationStatusText =
+            addDetail("Reservation status", result.status)
+
+        val canFinalize =
+            result.status.equals("Approved", ignoreCase = true)
 
         detailsCard.visibility = View.VISIBLE
-        finalizeButton.visibility = View.VISIBLE
-        finalizeButton.isEnabled = true
+        finalizeButton.visibility =
+            if (canFinalize) View.VISIBLE else View.GONE
+        finalizeButton.isEnabled = canFinalize
+        finalizeHint.visibility =
+            if (canFinalize) View.VISIBLE else View.GONE
     }
 
     private fun scanQrCode() {
@@ -338,6 +350,7 @@ class GridOperatorScanActivity : AppCompatActivity() {
             .startScan()
             .addOnSuccessListener { barcode ->
                 val code = barcode.rawValue
+
                 if (code.isNullOrBlank()) {
                     setStatus(
                         "Scan unsuccessful",
@@ -380,20 +393,39 @@ class GridOperatorScanActivity : AppCompatActivity() {
                         result?.verified == true &&
                         !result.reservationId.isNullOrBlank()
                     ) {
-                        verifiedReservationId = result.reservationId
+                        val completed =
+                            result.status.equals("Completed", ignoreCase = true)
+
+                        verifiedReservationId =
+                            if (result.status.equals(
+                                    "Approved",
+                                    ignoreCase = true
+                                )
+                            ) {
+                                result.reservationId
+                            } else {
+                                null
+                            }
+
                         showReservation(result)
 
-                        val message = if (result.alreadyVerified) {
-                            "Already verified by you. Review the reservation before finalizing."
+                        if (completed) {
+                            setStatus(
+                                "Transfer completed",
+                                "This QR code belongs to a completed transfer. You can view its reservation.",
+                                Color.rgb(45, 212, 160)
+                            )
                         } else {
-                            "QR code verified. Review the reservation before finalizing."
+                            setStatus(
+                                "Verified",
+                                if (result.alreadyVerified) {
+                                    "Already verified by you. Review the reservation before finalizing."
+                                } else {
+                                    "QR code verified. Review the reservation before finalizing."
+                                },
+                                Color.rgb(45, 212, 160)
+                            )
                         }
-
-                        setStatus(
-                            "Verified",
-                            message,
-                            Color.rgb(45, 212, 160)
-                        )
                     } else {
                         setStatus(
                             "Verification unsuccessful",
@@ -441,7 +473,8 @@ class GridOperatorScanActivity : AppCompatActivity() {
                     if (response.isSuccessful && result?.success == true) {
                         verifiedReservationId = null
                         finalizeButton.visibility = View.GONE
-                        addDetail("Transfer result", "Completed")
+                        finalizeHint.visibility = View.GONE
+                        reservationStatusText?.text = "Completed"
 
                         setStatus(
                             "Transfer completed",
@@ -479,10 +512,13 @@ class GridOperatorScanActivity : AppCompatActivity() {
     private fun errorMessage(response: Response<*>, fallback: String): String {
         return try {
             val body = response.errorBody()?.string()
+
             if (body.isNullOrBlank()) {
                 fallback
             } else {
-                JSONObject(body).optString("message").ifBlank { fallback }
+                JSONObject(body)
+                    .optString("message")
+                    .ifBlank { fallback }
             }
         } catch (_: Exception) {
             fallback
