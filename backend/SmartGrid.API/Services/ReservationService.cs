@@ -77,6 +77,7 @@ namespace SmartGrid.API.Services
         {
             var reservation = await GetOrThrowAsync(id);
             EnsureOwnerOrOperator(reservation, requesterNic, requesterRole);
+            EnsureActive(reservation);
 
             // 12-hour notice rule is checked against the current booking time
             ReservationRules.ValidateModificationWindow(reservation.ScheduledDateTime);
@@ -90,12 +91,19 @@ namespace SmartGrid.API.Services
             if (timeChanged)
                 ReservationRules.ValidateSchedulingWindow(newTime);
 
-            // Re-check availability whenever the slot or the time changes
-            if (timeChanged || slotChanged)
+            if (slotChanged)
             {
+                // New slot: must be free and cover the requested time
                 var available = await _nodeGateway.IsSlotAvailableAsync(reservation.NodeId, newSlotId, newTime);
                 if (!available)
                     throw new ReservationRuleException("Requested battery slot is not available for this time.");
+            }
+            else if (timeChanged)
+            {
+                // Same slot (already booked by this reservation): the new time must stay inside its window
+                var covered = await _nodeGateway.SlotCoversTimeAsync(reservation.NodeId, newSlotId, newTime);
+                if (!covered)
+                    throw new ReservationRuleException("The new time is outside this battery slot's time window. Please pick another slot.");
             }
 
             // Moving to a different slot: claim the new one -> release the old one
@@ -124,6 +132,7 @@ namespace SmartGrid.API.Services
         {
             var reservation = await GetOrThrowAsync(id);
             EnsureOwnerOrOperator(reservation, requesterNic, requesterRole);
+            EnsureActive(reservation);
             ReservationRules.ValidateModificationWindow(reservation.ScheduledDateTime);
 
             // Release the slot first
@@ -141,7 +150,7 @@ namespace SmartGrid.API.Services
         // ---------- PROSUMER READS ----------
         public async Task<List<ReservationResponseDto>> GetHistoryAsync(string nic)
         {
-            // Full booking history for one prosumer, newest first
+            // Full booking history for one prosumer (newest first)
             var results = await _db.Reservations
                 .Find(r => r.ProsumerNic == nic)
                 .SortByDescending(r => r.ScheduledDateTime)
@@ -289,6 +298,13 @@ namespace SmartGrid.API.Services
             // A prosumer may only change their own reservations
             if (requesterRole == "Prosumer" && reservation.ProsumerNic != requesterNic)
                 throw new UnauthorizedAccessException("You do not own this reservation.");
+        }
+
+        private static void EnsureActive(EnergyReservation reservation)
+        {
+            // Only Pending or Approved reservations still hold a slot, so only they can be changed
+            if (reservation.Status != ReservationStatus.Pending && reservation.Status != ReservationStatus.Approved)
+                throw new ReservationRuleException($"A {reservation.Status.ToString().ToLower()} reservation cannot be modified or cancelled.");
         }
 
         private static ReservationResponseDto MapToDto(EnergyReservation r) => new()

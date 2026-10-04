@@ -4,6 +4,7 @@ import {
   updateReservation,
   getAvailableSlots,
 } from "../../api/reservationService";
+import { nodeService } from "../../api/nodeService";
 
 const RESERVATION_TYPES = ["Charging", "EnergyDropOff"];
 
@@ -14,20 +15,33 @@ const getDefaultDateTime = () => {
   return now.toISOString().slice(0, 16);
 };
 
+// Converts the API's UTC time into local time for the datetime-local input
+const toLocalInput = (iso) => {
+  const d = new Date(iso);
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  return d.toISOString().slice(0, 16);
+};
+
+// Text shown for a slot in the dropdown
+const slotLabel = (slot) =>
+  slot.current
+    ? "Current slot"
+    : `${new Date(slot.startTime).toLocaleString()} - ${new Date(slot.endTime).toLocaleString()}`;
+
 export default function ReservationFormModal({
   mode, // "create" or "edit"
   reservation, // required when mode === "edit"
-  assignedNodeId = "", // Bound dynamically from parent
   onClose,
   onSaved,
 }) {
   const isOperator = localStorage.getItem("userRole") === "GridOperator";
 
   // Form State
-  const [nodeId] = useState(reservation?.nodeId ?? assignedNodeId);
+  const [nodes, setNodes] = useState([]);
+  const [nodeId, setNodeId] = useState(reservation?.nodeId ?? "");
   const [prosumerNic, setProsumerNic] = useState(reservation?.prosumerNic ?? "");
   const [scheduledDateTime, setScheduledDateTime] = useState(
-    reservation?.scheduledDateTime?.slice(0, 16) ?? getDefaultDateTime()
+    reservation?.scheduledDateTime ? toLocalInput(reservation.scheduledDateTime) : getDefaultDateTime()
   );
   const [batterySlotId, setBatterySlotId] = useState(reservation?.batterySlotId ?? "");
   const [type, setType] = useState(reservation?.type ?? RESERVATION_TYPES[0]);
@@ -38,6 +52,14 @@ export default function ReservationFormModal({
 
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+
+  // Load the microgrid nodes for the node dropdown
+  useEffect(() => {
+    nodeService
+      .getAll()
+      .then((list) => setNodes(list ?? []))
+      .catch(() => setError("Failed to load microgrid nodes."));
+  }, []);
 
   // Fetch available slots from API whenever nodeId or scheduledDateTime changes
   useEffect(() => {
@@ -52,19 +74,18 @@ export default function ReservationFormModal({
       try {
         const isoDateTime = new Date(scheduledDateTime).toISOString();
         const response = await getAvailableSlots(nodeId, isoDateTime);
-        const fetchedSlots = response.data ?? [];
-        setSlots(fetchedSlots);
+        const freeSlots = response.data?.data ?? [];
 
-        // Auto-select first slot if creating a new reservation or current slot is not available
-        if (fetchedSlots.length > 0) {
-          const firstSlot =
-            typeof fetchedSlots[0] === "object" ? fetchedSlots[0].id : fetchedSlots[0];
-          
-          if (mode === "create" || !fetchedSlots.includes(batterySlotId)) {
-            setBatterySlotId(firstSlot);
-          }
-        } else {
-          setBatterySlotId("");
+        // Edit mode: the booking's own slot is Booked, so it is not in the free list - keep it as an option
+        const ownSlotId = mode === "edit" ? reservation?.batterySlotId : null;
+        const list = ownSlotId
+          ? [{ id: ownSlotId, current: true }, ...freeSlots.filter((s) => s.id !== ownSlotId)]
+          : freeSlots;
+        setSlots(list);
+
+        // Create mode: auto-select the first free slot
+        if (mode === "create") {
+          setBatterySlotId(list[0]?.id ?? "");
         }
       } catch {
         setError("Failed to load available battery slots for the selected date & time.");
@@ -74,13 +95,15 @@ export default function ReservationFormModal({
     }
 
     fetchSlots();
-  }, [nodeId, scheduledDateTime, mode]);
+  }, [nodeId, scheduledDateTime, mode, reservation]);
 
   useEffect(() => {
     if (mode === "edit" && reservation) {
       setBatterySlotId(reservation.batterySlotId);
       setType(reservation.type);
-      setScheduledDateTime(reservation.scheduledDateTime?.slice(0, 16) ?? getDefaultDateTime());
+      setScheduledDateTime(
+        reservation.scheduledDateTime ? toLocalInput(reservation.scheduledDateTime) : getDefaultDateTime()
+      );
     }
   }, [reservation, mode]);
 
@@ -90,6 +113,11 @@ export default function ReservationFormModal({
 
     if (isOperator && mode === "create" && !prosumerNic.trim()) {
       setError("Prosumer NIC is required when creating a reservation as an operator.");
+      return;
+    }
+
+    if (!nodeId) {
+      setError("Please select a microgrid node.");
       return;
     }
 
@@ -147,18 +175,24 @@ export default function ReservationFormModal({
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* 1. Assigned Node ID (Read-Only) */}
+          {/* 1. Microgrid Node (locked when modifying - the node cannot be changed) */}
           <div>
             <label className="mb-1 block text-xs font-medium text-slate-400">
-              Assigned Node ID
+              Microgrid Node <span className="text-rose-400">*</span>
             </label>
-            <input
-              type="text"
+            <select
               value={nodeId}
-              disabled
-              placeholder="No Node Assigned"
-              className="w-full cursor-not-allowed rounded border border-slate-700 bg-slate-800/50 px-3 py-2 text-sm text-slate-400 outline-none"
-            />
+              onChange={(e) => setNodeId(e.target.value)}
+              disabled={mode === "edit"}
+              className="w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-100 outline-none focus:border-amber-500 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <option value="">Select a node</option>
+              {nodes.map((node) => (
+                <option key={node.id} value={node.id}>
+                  {node.nodeName}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* 2. Prosumer NIC (Operator Mode) */}
@@ -212,15 +246,11 @@ export default function ReservationFormModal({
                   ? "No slots available at this time"
                   : "Select a slot"}
               </option>
-              {slots.map((slot) => {
-                const val = typeof slot === "object" ? slot.id : slot;
-                const label = typeof slot === "object" ? slot.label : slot;
-                return (
-                  <option key={val} value={val}>
-                    {label}
-                  </option>
-                );
-              })}
+              {slots.map((slot) => (
+                <option key={slot.id} value={slot.id}>
+                  {slotLabel(slot)}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -263,5 +293,3 @@ export default function ReservationFormModal({
     </div>
   );
 }
-
-
