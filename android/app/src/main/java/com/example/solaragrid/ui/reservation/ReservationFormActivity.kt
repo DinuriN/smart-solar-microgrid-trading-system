@@ -142,7 +142,7 @@ class ReservationFormActivity : AppCompatActivity() {
         }
     }
 
-    // Date picker, then time picker (limited to the next 7 days as a hint; server enforces it)
+    // Date picker, then time picker. Any date can be picked; the server enforces the 7-day rule
     private fun pickDateTime() {
         val cal = Calendar.getInstance()
         arrival?.let { cal.time = it }
@@ -154,9 +154,6 @@ class ReservationFormActivity : AppCompatActivity() {
                 loadSlots()
             }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
         }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH))
-        val now = System.currentTimeMillis()
-        dateDialog.datePicker.minDate = now - 1000
-        dateDialog.datePicker.maxDate = now + 7L * 24 * 60 * 60 * 1000
         dateDialog.show()
     }
 
@@ -246,7 +243,12 @@ class ReservationFormActivity : AppCompatActivity() {
                     finish()
                 } else {
                     // e.g. "Reservations must be scheduled within the next 7 days."
-                    showError(apiErrorMessage(r, "Could not save the reservation (HTTP ${r.code()})."))
+                    if (isFinishing) return
+                    showServerMessage(
+                        this@ReservationFormActivity,
+                        if (current == null) "Reservation not created" else "Reservation not changed",
+                        apiErrorMessage(r, "Could not save the reservation (HTTP ${r.code()}).")
+                    )
                 }
             }
 

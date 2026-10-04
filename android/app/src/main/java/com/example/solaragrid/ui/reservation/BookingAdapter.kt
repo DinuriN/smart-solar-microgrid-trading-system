@@ -35,7 +35,6 @@ class BookingAdapter(
         val actions: LinearLayout = view.findViewById(R.id.bookingActions)
         val modify: Button = view.findViewById(R.id.btnModify)
         val cancel: Button = view.findViewById(R.id.btnCancel)
-        val locked: TextView = view.findViewById(R.id.tvLocked)
     }
 
     // Replaces the list shown by the adapter
@@ -58,13 +57,10 @@ class BookingAdapter(
         holder.meta.text = "${r.id.takeLast(8).uppercase()} · ${typeLabel(r.type)}"
         styleBadge(holder.badge, r.status)
 
-        // Modify / Cancel only for Current and Pending bookings
+        // Modify / Cancel are offered on Current and Pending bookings.
+        // The server decides whether the change is allowed (12-hour rule).
         val editable = actionsEnabled && r.tab() != BookingTab.HISTORY
         holder.actions.visibility = if (editable) View.VISIBLE else View.GONE
-        val locked = editable && r.isLocked()
-        holder.modify.isEnabled = !locked
-        holder.cancel.isEnabled = !locked
-        holder.locked.visibility = if (locked) View.VISIBLE else View.GONE
         holder.modify.setOnClickListener { onModify(r) }
         holder.cancel.setOnClickListener { onCancel(r) }
     }

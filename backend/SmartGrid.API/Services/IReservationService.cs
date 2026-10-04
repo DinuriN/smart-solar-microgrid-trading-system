@@ -17,6 +17,7 @@ namespace SmartGrid.API.Services
         Task CancelAsync(string id, string requesterNic, string requesterRole);
         Task<List<ReservationResponseDto>> GetHistoryAsync(string nic);
         Task<ReservationCountsDto> GetCountsAsync(string nic);
+        Task<List<ReservationResponseDto>> GetUpcomingAsync(string nic, int limit = 3);
         Task<List<ReservationResponseDto>> GetOperatorReservationsAsync(string operatorId, List<string>? statuses);
         Task<ReservationResponseDto?> GetNextForOperatorAsync(string operatorId);
 

@@ -1,7 +1,7 @@
 /*
  * File Name    : ReservationUi.kt
  * Description  : Shared display helpers for the reservation screens: date parsing and
- *                formatting, tab grouping, status badges, node names and API error text.
+ *                formatting, tab grouping, status badges, node names and API error messages.
  * Author       : Kandaudahewa C I
  * IT Number    : IT23453142
  * Date         : 2026-09-28
@@ -10,6 +10,7 @@ package com.example.solaragrid.ui.reservation
 
 import android.content.Context
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import com.example.solaragrid.R
 import com.example.solaragrid.api.ApiClient
@@ -66,20 +67,12 @@ object ReservationTime {
 // ---------- Tabs and display state ----------
 enum class BookingTab { CURRENT, PENDING, HISTORY }
 
-// Which My Bookings tab a reservation belongs to (display grouping of server statuses)
-fun ReservationDto.tab(now: Date = Date()): BookingTab {
-    val start = ReservationTime.parse(scheduledDateTime)
-    return when {
-        status.equals("Pending", true) -> BookingTab.PENDING
-        status.equals("Approved", true) && start != null && start.after(now) -> BookingTab.CURRENT
-        else -> BookingTab.HISTORY
-    }
-}
-
-// Greys out Modify/Cancel when the booking is under 12 hours away (server re-checks)
-fun ReservationDto.isLocked(now: Date = Date()): Boolean {
-    val start = ReservationTime.parse(scheduledDateTime) ?: return true
-    return start.time - now.time < 12 * 60 * 60 * 1000L
+// Which My Bookings tab a reservation belongs to.
+// Display grouping of the server's status only - no time or rule checks on the phone.
+fun ReservationDto.tab(): BookingTab = when {
+    status.equals("Pending", true) -> BookingTab.PENDING
+    status.equals("Approved", true) -> BookingTab.CURRENT
+    else -> BookingTab.HISTORY
 }
 
 // Human label for the reservation type
@@ -108,6 +101,15 @@ fun apiErrorMessage(response: Response<*>, fallback: String): String {
     } catch (e: Exception) {
         fallback
     }
+}
+
+// Shows a message from the server (e.g. the 7-day or 12-hour rule) in a pop-up
+fun showServerMessage(context: Context, title: String, message: String) {
+    AlertDialog.Builder(context)
+        .setTitle(title)
+        .setMessage(message)
+        .setPositiveButton("OK", null)
+        .show()
 }
 
 // ---------- Node names (reference data cached in SQLite) ----------

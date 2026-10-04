@@ -19,6 +19,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ReservationApi {
 
@@ -29,6 +30,14 @@ interface ReservationApi {
     // Active (Approved) and Pending counts for the dashboard
     @GET("api/reservations/counts/{nic}")
     fun getCounts(@Path("nic") nic: String): Call<ReservationCountsDto>
+
+    // Next upcoming bookings of the logged-in prosumer; the server filters, sorts and limits them
+    @GET("api/reservations/upcoming")
+    fun getUpcoming(): Call<List<ReservationDto>>
+
+    // Server-side search (NIC, node name, node ID, slot ID or reservation ID), scoped to the caller
+    @GET("api/reservations/search")
+    fun search(@Query("criteria") criteria: String): Call<List<ReservationDto>>
 
     // Creates a new reservation (saved as Pending)
     @POST("api/reservations")

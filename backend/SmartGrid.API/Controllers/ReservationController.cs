@@ -122,6 +122,17 @@ namespace SmartGrid.API.Controllers
             return Ok(counts);
         }
 
+        /// <summary>Returns the logged-in prosumer's next upcoming bookings (Pending or Approved), soonest first</summary>
+        [HttpGet("upcoming")]
+        [Authorize(Roles = "Prosumer")]
+        [ProducesResponseType(typeof(List<ReservationResponseDto>), 200)]
+        public async Task<IActionResult> GetUpcoming()
+        {
+            //The prosumer is taken from the login token, so no NIC is passed in
+            var upcoming = await _reservationService.GetUpcomingAsync(RequesterNic);
+            return Ok(upcoming);
+        }
+
         /// <summary>Returns reservations assigned to a Grid Operator, optionally filtered by status</summary>
         [HttpGet("operator/{operatorId}")]
         [Authorize(Roles = "GridOperator")]

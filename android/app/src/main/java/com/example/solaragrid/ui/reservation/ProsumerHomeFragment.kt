@@ -35,7 +35,7 @@ import java.util.Calendar
 class ProsumerHomeFragment : Fragment() {
 
     private var countsCall: Call<ReservationCountsDto>? = null
-    private var historyCall: Call<List<ReservationDto>>? = null
+    private var upcomingCall: Call<List<ReservationDto>>? = null
     private lateinit var adapter: BookingAdapter
 
     // Inflates the dashboard layout
@@ -96,7 +96,7 @@ class ProsumerHomeFragment : Fragment() {
         NodeDirectory.refresh(requireContext()) {
             if (!isAdded || view == null) return@refresh
             loadCounts(nic)
-            loadUpcoming(nic)
+            loadUpcoming()
         }
     }
 
@@ -119,14 +119,14 @@ class ProsumerHomeFragment : Fragment() {
         })
     }
 
-    // GET /api/reservations/history/{nic} -> next 3 current or pending bookings
-    private fun loadUpcoming(nic: String) {
+    // GET /api/reservations/upcoming -> the server returns the next bookings, ready to display
+    private fun loadUpcoming() {
         val root = view ?: return
         val status = root.findViewById<TextView>(R.id.tvHomeStatus)
-        historyCall?.cancel()
+        upcomingCall?.cancel()
         val call = ApiClient.getClient(requireContext().applicationContext)
-            .create(ReservationApi::class.java).getHistory(nic)
-        historyCall = call
+            .create(ReservationApi::class.java).getUpcoming()
+        upcomingCall = call
         call.enqueue(object : Callback<List<ReservationDto>> {
             override fun onResponse(c: Call<List<ReservationDto>>, r: Response<List<ReservationDto>>) {
                 if (!isAdded || view !== root) return
@@ -135,9 +135,6 @@ class ProsumerHomeFragment : Fragment() {
                     return
                 }
                 val upcoming = r.body().orEmpty()
-                    .filter { it.tab() != BookingTab.HISTORY }
-                    .sortedBy { ReservationTime.parse(it.scheduledDateTime)?.time ?: Long.MAX_VALUE }
-                    .take(3)
                 adapter.submit(upcoming)
                 status.text = "No upcoming bookings. Tap + to reserve a slot."
                 status.visibility = if (upcoming.isEmpty()) View.VISIBLE else View.GONE
@@ -165,7 +162,7 @@ class ProsumerHomeFragment : Fragment() {
     // Cancels running requests when the view goes away
     override fun onDestroyView() {
         countsCall?.cancel()
-        historyCall?.cancel()
+        upcomingCall?.cancel()
         super.onDestroyView()
     }
 }
