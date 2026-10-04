@@ -11,6 +11,7 @@ namespace SmartGrid.API.Services
     public interface INodeGateway
     {
         Task<bool> IsSlotAvailableAsync(string nodeId, string slotId, DateTime scheduledDateTime);
+        Task<bool> SlotCoversTimeAsync(string nodeId, string slotId, DateTime time);
         Task<bool> SetSlotBookedAsync(string nodeId, string slotId, bool booked);
         Task<List<string>> GetOperatorNodeIdsAsync(string operatorId);
         Task<List<string>> GetAvailableSlotsAsync(string nodeId);

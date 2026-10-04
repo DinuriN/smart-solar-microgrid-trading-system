@@ -19,10 +19,18 @@ namespace SmartGrid.API.Services
             _nodeService = nodeService;
         }
 
-        // Checks that the slot exists on the node and has "Available" status
+        // Checks that the slot is "Available" and its time window covers the requested time
         public async Task<bool> IsSlotAvailableAsync(string nodeId, string slotId, DateTime scheduledDateTime)
         {
-            return await _nodeService.IsBatterySlotAvailableAsync(nodeId, slotId);
+            var free = await _nodeService.GetAvailableSlotsAtTimeAsync(nodeId, scheduledDateTime);
+            return free.Any(s => s.Id == slotId);
+        }
+
+        // Checks that the time falls inside the slot's window, whatever the slot's status (used when a reservation keeps its own, already booked, slot and only the time changes)
+        public async Task<bool> SlotCoversTimeAsync(string nodeId, string slotId, DateTime time)
+        {
+            var slot = await _nodeService.GetSlotAsync(nodeId, slotId);
+            return slot != null && slot.StartTime <= time && slot.EndTime >= time;
         }
 
         // Marks a slot as "Booked" or releases it back to "Available" after a reservation change
@@ -32,12 +40,11 @@ namespace SmartGrid.API.Services
             return await _nodeService.UpdateSlotStatusAsync(nodeId, slotId, status);
         }
 
-        // Gets the nodes the operator is bound to
-        public Task<List<string>> GetOperatorNodeIdsAsync(string operatorId)
+        // Gets the nodes a grid operator works with. (Operators are not tied to one node for now)
+        public async Task<List<string>> GetOperatorNodeIdsAsync(string operatorId)
         {
-            // TODO(Member 2): needs an operator ID on nodes and a lookup method.
-            // TEMPORARY empty list: operators see no reservations until this is replaced.
-            return Task.FromResult(new List<string>());
+            var nodes = await _nodeService.GetAllActiveNodesAsync();
+            return nodes.Select(n => n.Id).ToList();
         }
 
         // Gets all slot IDs that are currently "Available" on a given node

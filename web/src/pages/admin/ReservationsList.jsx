@@ -15,7 +15,7 @@ const FILTERS = ["All", "Pending", "Approved", "Cancelled"];
 
 export default function ReservationsList() {
   const role = localStorage.getItem("userRole"); // "BackOfficeUser" or "GridOperator"
-  const operatorId = localStorage.getItem("userId");
+  const operatorId = "all"; // grid operators see the reservations of every node
 
   const [reservations, setReservations] = useState([]);
   const [filter, setFilter] = useState("All");
@@ -25,9 +25,6 @@ export default function ReservationsList() {
 
   const [formModal, setFormModal] = useState(null); 
   const [cancelTarget, setCancelTarget] = useState(null);
-
-  // Dynamic assigned node ID derived from operator reservations
-  const [assignedNodeId, setAssignedNodeId] = useState("");
 
   const isBackOffice = role === "BackOfficeUser";
 
@@ -58,13 +55,7 @@ export default function ReservationsList() {
           : await getOperatorReservations(operatorId, statusParam);
       }
 
-      const fetchedData = response.data ?? [];
-      setReservations(fetchedData);
-
-      // Automatically set the assignedNodeId from the first reservation record
-      if (!isBackOffice && fetchedData.length > 0 && fetchedData[0]?.nodeId) {
-        setAssignedNodeId(fetchedData[0].nodeId);
-      }
+      setReservations(response.data ?? []);
     } catch {
       setError("Could not load reservations.");
     } finally {
@@ -265,7 +256,6 @@ export default function ReservationsList() {
         <ReservationFormModal
           mode={formModal.mode}
           reservation={formModal.reservation}
-          assignedNodeId={assignedNodeId}
           onClose={() => setFormModal(null)}
           onSaved={loadReservations}
         />
