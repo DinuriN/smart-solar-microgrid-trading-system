@@ -72,7 +72,7 @@ namespace SmartGrid.API.Controllers
                 });
             }
 
-            // TODO: Confirm the final reservation status values with Member 3.
+            
             if (reservation.Status != ReservationStatus.Approved)
             {
                 return BadRequest(new
@@ -85,11 +85,29 @@ namespace SmartGrid.API.Controllers
 
             if (reservation.QrCode?.VerifiedAt != null)
             {
-                return BadRequest(new
+                if (reservation.QrCode.VerifiedBy != OperatorId)
                 {
-                    verified = false,
-                    message =
-                        "This QR code has already been verified."
+                    return Conflict(new
+                    {
+                        verified = false,
+                        message = "This QR code was verified by another operator."
+                    });
+                }
+
+                return Ok(new
+                {
+                    verified = true,
+                    alreadyVerified = true,
+                    reservationId = reservation.Id,
+                    prosumerNic = reservation.ProsumerNic,
+                    nodeId = reservation.NodeId,
+                    batterySlotId = reservation.BatterySlotId,
+                    type = reservation.Type.ToString(),
+                    scheduledDateTime = reservation.ScheduledDateTime,
+                    status = reservation.Status.ToString(),
+                    verifiedBy = reservation.QrCode.VerifiedBy,
+                    verifiedAt = reservation.QrCode.VerifiedAt,
+                    message = "QR code verified successfully."
                 });
             }
 
@@ -113,8 +131,14 @@ namespace SmartGrid.API.Controllers
             return Ok(new
             {
                 verified = true,
+                alreadyVerified = false,
                 reservationId = reservation.Id,
-                status = reservation.Status,
+                prosumerNic = reservation.ProsumerNic,
+                nodeId = reservation.NodeId,
+                batterySlotId = reservation.BatterySlotId,
+                type = reservation.Type.ToString(),
+                scheduledDateTime = reservation.ScheduledDateTime,
+                status = reservation.Status.ToString(),
                 verifiedBy = OperatorId,
                 verifiedAt = verifiedAt,
                 message = "QR code verified successfully."
