@@ -86,10 +86,7 @@ export default function WebUsersList() {
   return (
     <div className="max-w-7xl">
 
-      <div className="mb-8">
-        <h1 className="text-xl font-semibold text-white">Web Users Directory</h1>
-        <div className="text-slate-500 font-mono text-xs mt-1">solara-grid / administration / web users</div>
-      </div>
+
 
       {error && (
         <div className="bg-red-500/10 border border-red-500 text-red-500 px-4 py-3 rounded mb-5 text-sm">

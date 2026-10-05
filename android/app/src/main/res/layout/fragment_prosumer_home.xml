@@ -127,7 +127,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Nearby grid nodes: Member 2 puts the map card inside this container -->
+            <!-- Nearby grid nodes: Member 2 the map card inside this container -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -137,21 +137,30 @@
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
-            <FrameLayout
+            <!-- Small Preview Map Card -->
+            <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/nearbyNodesContainer"
+                android:name="com.example.solaragrid.ui.dashboard.MapFragment"
                 android:layout_width="match_parent"
-                android:layout_height="130dp"
+                android:layout_height="200dp"
                 android:layout_marginTop="10dp"
-                android:background="@drawable/bg_card">
+                android:background="@drawable/bg_card"
+                android:clickable="false"
+                android:focusable="false" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="Nearby nodes map (Member 2)"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp" />
-            </FrameLayout>
+            <!-- View Full Map Button -->
+            <Button
+                android:id="@+id/btnViewFullMap"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="@color/solara_yellow"
+                android:text="View Full Interactive Map →"
+                android:textColor="@color/btn_text"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textAllCaps="false"
+                android:padding="14dp" />
 
             <!-- Upcoming bookings -->
             <LinearLayout
