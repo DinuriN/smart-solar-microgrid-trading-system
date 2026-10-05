@@ -1,16 +1,27 @@
 package com.example.solaragrid
 
+import android.content.Context
 import android.os.Bundle
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import com.example.solaragrid.database.UserManager
 import com.example.solaragrid.ui.auth.LoginActivity
 import com.example.solaragrid.ui.dashboard.DashboardActivity
+import com.example.solaragrid.ui.onboarding.OnboardingActivity
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
+        val sharedPrefs = getSharedPreferences("SolaraGridPrefs", Context.MODE_PRIVATE)
+        val hasSeenOnboarding = sharedPrefs.getBoolean("hasSeenOnboarding", false)
+
+        if (!hasSeenOnboarding) {
+            startActivity(Intent(this, OnboardingActivity::class.java))
+            finish()
+            return
+        }
+
         // Check SQLite UserManager to see if they are already logged in
         val user = UserManager(this).getLoggedInUser()
         

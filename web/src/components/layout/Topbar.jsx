@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { usePageHeader } from '../../context/PageHeaderContext';
 
 export default function Topbar() {
@@ -12,7 +13,10 @@ export default function Topbar() {
         <div className="mt-0.5 font-mono text-[11px] text-slate-500">{header.breadcrumb}</div>
       </div>
 
-      <div className="flex items-center">
+      <div className="flex items-center gap-6">
+        <Link to="/" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">
+          Home
+        </Link>
         <div className="flex items-center gap-2 font-mono text-[11px] text-slate-400">
           {/* Animated pulsing dot */}
           <span className="relative flex h-2 w-2">
