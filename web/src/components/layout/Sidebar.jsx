@@ -62,14 +62,14 @@ export default function Sidebar() {
 
       {/* Brand */}
       <div className="p-6 pb-8">
-        <div className="flex items-center gap-3">
+        <NavLink to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
           <div className="w-8 h-8 bg-amber-500 rounded flex items-center justify-center">
             <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4 text-slate-950">
               <path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z" fill="currentColor" />
             </svg>
           </div>
           <span className="text-white font-bold tracking-wide">Solara Grid</span>
-        </div>
+        </NavLink>
       </div>
 
       {/* Dynamic Navigation - driven entirely by the backend menu response */}
